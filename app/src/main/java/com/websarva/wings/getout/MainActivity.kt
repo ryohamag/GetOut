@@ -20,5 +20,14 @@ class MainActivity : AppCompatActivity() {
             // 月グラフ画面の起動。
             startActivity(intent2ChartMonth)
         }
+
+        val btWeek = findViewById<Button>(R.id.btWeek)
+        //ボタンクリックのリスナーを設定。
+        btWeek.setOnClickListener {
+            //インテントオブジェクトを生成。
+            val intent2ChartWeek = Intent(this@MainActivity, ChartWeekActivity::class.java)
+            // 月グラフ画面の起動。
+            startActivity(intent2ChartWeek)
+        }
     }
 }
