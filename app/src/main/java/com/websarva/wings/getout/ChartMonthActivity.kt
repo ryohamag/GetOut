@@ -40,6 +40,8 @@ class ChartMonthActivity : AppCompatActivity() {
         //BarChartにBarData格納
         val barChart = findViewById<BarChart>(R.id.barChartExample)
         barChart.data = barData
+        barChart.legend.isEnabled= false
+        barChart.description.text = ""
         //Chartのフォーマット指定
         //X軸の設定
         barChart.xAxis.apply {
