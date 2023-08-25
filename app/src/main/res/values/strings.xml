@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GetOut</string>
+    <string name="bt_getOut">外出</string>
+    <string name="bt_getHome">帰宅</string>
 </resources>
