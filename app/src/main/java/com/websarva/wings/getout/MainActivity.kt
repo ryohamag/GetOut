@@ -16,6 +16,9 @@ import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
+    // 帰宅状態：０　外出状態：１を示すフラグ
+    var statusFlag = 0
+
     //データベースヘルパーオブジェクトを作成
     private val _helper = DatabaseHelper(this@MainActivity)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +68,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onReloadButtonClick(view: View){ // サーバー内のデータを確認する
+
         val db = _helper.writableDatabase
 
         // 外出の方
@@ -72,9 +76,9 @@ class MainActivity : AppCompatActivity() {
         var cursor = db.rawQuery(sql,null)
 
         var log =""
-        var count=0
+        var count = 0
         while (cursor.moveToNext()) {
-            val idxNote = cursor.getColumnIndex("getOutTime")
+            val idxNote = cursor.getColumnIndex("getOutMin")
             // 所得したデータをlogに追加
             log += cursor.getString(idxNote)
             log += " "
@@ -83,79 +87,103 @@ class MainActivity : AppCompatActivity() {
         }
         Log.i("count", "GetOutCount=" + count)
         // tvGetOutTimeにlogのテキストを設定
-        val GOCoutput = findViewById<TextView>(R.id.tvGetOutTime)
-        GOCoutput.text = log
+        val GetOutOutput = findViewById<TextView>(R.id.tvGetOutTime)
+        GetOutOutput.text = log
 
 
+        // 帰宅の方
         sql = "SELECT * FROM GetHomeTimeLogs"
         cursor = db.rawQuery(sql,null)
 
         log =""
         count = 0 // index数を数える
         while (cursor.moveToNext()) {
-            val idxNote = cursor.getColumnIndex("getHomeTime")
+            val idxNote = cursor.getColumnIndex("getHomeMin")
             //　所得したデータをlogに追加
             log += cursor.getString(idxNote)
             log += " "
 //            output.text = log
             count++
         }
-        Log.i("count", "GetHomeCount=" + count)
+        Log.i("count", "GetHomeCount = " + count)
         // tvGetHomeTimeにlogのテキストを反映させる。
-        val GHCoutput = findViewById<TextView>(R.id.tvGetHomeTime)
-        GHCoutput.text = log
+        val GetHomeOutput = findViewById<TextView>(R.id.tvGetHomeTime)
+        GetHomeOutput.text = log
     }
+    fun onGetOutButtonClick(view: View){ // 外出ボタンを押したときの処理
+        // もし外出状態ならば
+        if(statusFlag === 1){
+            // 関数を終了する
+            return
+        }
 
-    fun onGetOutButtonClick(view: View){
+        // 外出フラグを立てる
+        statusFlag = 1
 
         // 現在日時を所得
         val dfDate = SimpleDateFormat("yyyyMMdd")
-        val dfTime = SimpleDateFormat("HHmm")
+        val dfHour = SimpleDateFormat("HH")
+        val dfMin = SimpleDateFormat("mm")
         val date = dfDate.format(Date())
-        val time = dfTime.format(Date())
+        val hour = dfHour.format(Date())
+        val min = dfMin.format(Date())
 //        val output = findViewById<TextView>(R.id.tvGetOutTime)
 //        output.text = date.toString()+time.toString()
 
         val db = _helper.writableDatabase
 
         //　現在日時をデータベースに記述
-        val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutTime) VALUES (?, ?)"
+        val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
         var stmt = db.compileStatement(sqlInsert)
         //　変数のバインド
         stmt.bindString(1, date.toString())
-        stmt.bindString(2, time.toString())
+        stmt.bindString(2, hour.toString())
+        stmt.bindString(3, min.toString())
 
         stmt.executeInsert()
 
         Log.i("test", date)
     }
 
-    fun onGetHomeButtonClick(view:View){
+    fun onGetHomeButtonClick(view:View){ // 帰宅ボタンを押したときの処理
+        // もし在宅状態ならば
+        if(statusFlag === 0){
+            // 関数を終了する
+            return
+        }
+
+        // 外出フラグを立てる
+        statusFlag = 0
 
         // 現在日時を所得
         val dfDate = SimpleDateFormat("yyyyMMdd")
-        val dfTime = SimpleDateFormat("HHmm")
+        val dfHour = SimpleDateFormat("HH")
+        val dfMin = SimpleDateFormat("mm")
         val date = dfDate.format(Date())
-        val time = dfTime.format(Date())
+        val hour = dfHour.format(Date())
+        val min = dfMin.format(Date())
 //        // 現在日時を表示
 //        val output = findViewById<TextView>(R.id.tvGetHomeTime)
 //        output.text = date.toString() + time.toString()
 
-
         val db = _helper.writableDatabase
 
         //　現在日時をデータベースに記述
-        val sqlInsert = "INSERT INTO GetHomeTimeLogs (getHomeDate, getHomeTime) VALUES (?, ?)"
+        val sqlInsert = "INSERT INTO GetHomeTimeLogs (getHomeDate, getHomeHour, getHomeMin) VALUES (?, ?, ?)"
         var stmt = db.compileStatement(sqlInsert)
         //　変数のバインド
         stmt.bindString(1, date.toString())
-        stmt.bindString(2, time.toString())
+        stmt.bindString(2, hour.toString())
+        stmt.bindString(3, min.toString())
 
         stmt.executeInsert()
 
-
-
         Log.i("test", date)
+    }
+
+    // 時間データから経過時間を計算する関数
+    fun makeTimeLogs(startTime: String, endTime: String){
+
     }
     // CalendarViewで日にちが選択された時に呼び出されるリスナークラス
     private inner class DateChangeListener : CalendarView.OnDateChangeListener {
@@ -165,4 +193,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, "$year/$displayMonth/$dayOfMonth", Toast.LENGTH_LONG).show()
         }
     }
+
+
 }
