@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">GetOut</string>
+    <string name="bt_getOut">外出</string>
+    <string name="bt_getHome">帰宅</string>
     <string name="bt_month">月</string>
     <string name="bt_week">週</string>
     <string name="bt_day">日</string>
