@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
 import android.util.Log
+import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.Date
@@ -46,9 +47,21 @@ class MainActivity : AppCompatActivity() {
     fun onGetOutButtonClick(view: View){
 
         // 現在日時を表示
-//        val date1 = LocalDateTime.now()
-        val df = SimpleDateFormat("yyyy年MM月dd日 HH:mm")
+        val df = SimpleDateFormat("yyyyMMdd HH:mm")
         val date = df.format(Date())
+        val output = findViewById<TextView>(R.id.tvGetOutTime)
+        output.text = date.toString()
+
+        Log.i("test", date)
+    }
+
+    fun onGetHomeButtonClick(view:View){
+
+        // 現在日時を表示
+        val df = SimpleDateFormat("yyyyMMdd HH:mm")
+        val date = df.format(Date())
+        val output = findViewById<TextView>(R.id.tvGetHomeTime)
+        output.text = date.toString()
 
         Log.i("test", date)
     }
