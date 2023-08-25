@@ -28,18 +28,28 @@ class ChartMonthActivity : AppCompatActivity() {
             104,
             52,
             84,
-            114
+            114,
+            87,
+            99,
+            108,
+            112,
+            129
         )
 
         // X 軸のタイムスタンプ
         val entriesTimestampMills: MutableList<String> = mutableListOf(
-            "Jan",  // 2021/03/01 00:00:00
-            "Feb",  // 2021/03/02 00:00:00
-            "Mar",  // 2021/03/03 00:00:00
-            "Apr",  // 2021/03/04 00:00:00
-            "May",  // 2021/03/05 00:00:00
-            "Jun",  // 2021/03/06 00:00:00
-            "July"   // 2021/03/07 00:00:00
+            "Jan.",
+            "Feb.",
+            "Mar.",
+            "Apr.",
+            "May.",
+            "Jun.",
+            "Jul.",
+            "Aug.",
+            "Sep.",
+            "Oct.",
+            "Nov.",
+            "Dec."
         )
 
         // グラフに描画するデータの設定
@@ -63,23 +73,27 @@ class ChartMonthActivity : AppCompatActivity() {
 
         // X 軸のフォーマッター
         val xAxisFormatter = object : ValueFormatter() {
-            private var simpleDateFormat: SimpleDateFormat =
-                SimpleDateFormat("M/d", Locale.getDefault())
-
             override fun getFormattedValue(value: Float): String {
-                // value には 0, 1, 2... という index が入ってくるので
-                // index からタイムスタンプを取得する
-                val timestampMills = entriesTimestampMills[value.toInt()]
-                val date = Date(timestampMills)
-                return simpleDateFormat.format(date)
+                val index = value.toInt()
+                if (index >= 0 && index < entriesTimestampMills.size) {
+                    return entriesTimestampMills[index]
+                }
+                return "" // リストの範囲外の場合は空文字列を返すか、適切なデフォルト値を返すことも考慮できます
             }
         }
+
 
         // X 軸の設定
         barChart.xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
             valueFormatter = xAxisFormatter
             setDrawGridLines(false)
+
+            // X 軸のラベル数を月の数に設定
+            labelCount = entriesTimestampMills.size
+
+            // ラベルの間隔を調整（1.0fは全ての月を表示するための間隔）
+            granularity = 1.0f
         }
 
         // Y 軸（左）の設定
