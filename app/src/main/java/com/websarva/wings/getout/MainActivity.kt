@@ -44,13 +44,44 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    fun onReloadButtonClick(view: View){ // サーバー内のデータを確認する
+        val db = _helper.writableDatabase
+        val sql = "SELECT * FROM GetOutTimeLogs"
+        val cursor = db.rawQuery(sql,null)
+
+        var log =""
+        var count=0
+        while (cursor.moveToNext()) {
+            val idxNote = cursor.getColumnIndex("getOutTime")
+            log += cursor.getString(idxNote)
+            log += " "
+//            output.text = log
+            count++
+        }
+        Log.i("count", "count="+count)
+        val output = findViewById<TextView>(R.id.tvGetOutTime)
+        output.text = log
+    }
+
     fun onGetOutButtonClick(view: View){
 
         // 現在日時を表示
-        val df = SimpleDateFormat("yyyyMMdd HH:mm")
-        val date = df.format(Date())
-        val output = findViewById<TextView>(R.id.tvGetOutTime)
-        output.text = date.toString()
+        val dfDate = SimpleDateFormat("yyyyMMdd")
+        val dfTime = SimpleDateFormat("HHmm")
+        val date = dfDate.format(Date())
+        val time = dfTime.format(Date())
+//        val output = findViewById<TextView>(R.id.tvGetOutTime)
+//        output.text = date.toString()+time.toString()
+
+        val db = _helper.writableDatabase
+
+        val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutTime) VALUES (?, ?)"
+        var stmt = db.compileStatement(sqlInsert)
+        //　変数のバインド
+        stmt.bindString(1, date.toString())
+        stmt.bindString(2, time.toString())
+
+        stmt.executeInsert()
 
         Log.i("test", date)
     }
@@ -62,6 +93,8 @@ class MainActivity : AppCompatActivity() {
         val date = df.format(Date())
         val output = findViewById<TextView>(R.id.tvGetHomeTime)
         output.text = date.toString()
+
+
 
         Log.i("test", date)
     }

@@ -12,15 +12,26 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        val sb = StringBuilder()
-        sb.append("CREATE TABLE TimeLogs(")
-        sb.append("_id INTEGER PRIMARY KEY,")
-        sb.append("getOutTime DATETIME,")
-        sb.append("getHomeTime DATETIME")
-        sb.append(");")
-        val sql = sb.toString()
+        //　外出日時を記録するデータベースを作成
+        val sbGetOutLogs = StringBuilder()
+        sbGetOutLogs.append("CREATE TABLE GetOutTimeLogs(")
+//        sbGetOutLogs.append("_id INTEGER PRIMARY KEY,")
+        sbGetOutLogs.append("getOutDate TEXT,")
+        sbGetOutLogs.append("getOutTime TEXT")
+        sbGetOutLogs.append(");")
+        val sqlGO = sbGetOutLogs.toString()
+        db.execSQL(sqlGO)
 
-        db.execSQL(sql)
+//        //　帰宅日時を記録するデータベースを作成
+//        val sbGetHomeLogs = StringBuilder()
+//        sbGetHomeLogs.append("CREATE TABLE GetHomeTimeLogs(")
+////        sbGetHomeLogs.append("_id INTEGER PRIMARY KEY,")
+//        sbGetHomeLogs.append("getHomeDate DATE,")
+//        sbGetHomeLogs.append("getHomeTime TIME")
+//        sbGetHomeLogs.append(");")
+//        val sqlGH = sbGetHomeLogs.toString()
+//        db.execSQL(sqlGH)
+
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
