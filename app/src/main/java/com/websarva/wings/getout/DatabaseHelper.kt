@@ -22,15 +22,15 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         val sqlGO = sbGetOutLogs.toString()
         db.execSQL(sqlGO)
 
-//        //　帰宅日時を記録するデータベースを作成
-//        val sbGetHomeLogs = StringBuilder()
-//        sbGetHomeLogs.append("CREATE TABLE GetHomeTimeLogs(")
-////        sbGetHomeLogs.append("_id INTEGER PRIMARY KEY,")
-//        sbGetHomeLogs.append("getHomeDate DATE,")
-//        sbGetHomeLogs.append("getHomeTime TIME")
-//        sbGetHomeLogs.append(");")
-//        val sqlGH = sbGetHomeLogs.toString()
-//        db.execSQL(sqlGH)
+        //　帰宅日時を記録するデータベースを作成
+        val sbGetHomeLogs = StringBuilder()
+        sbGetHomeLogs.append("CREATE TABLE GetHomeTimeLogs(")
+//        sbGetHomeLogs.append("_id INTEGER PRIMARY KEY,")
+        sbGetHomeLogs.append("getHomeDate TEXT,")
+        sbGetHomeLogs.append("getHomeTime TEXT")
+        sbGetHomeLogs.append(");")
+        val sqlGH = sbGetHomeLogs.toString()
+        db.execSQL(sqlGH)
 
     }
 

@@ -66,26 +66,49 @@ class MainActivity : AppCompatActivity() {
 
     fun onReloadButtonClick(view: View){ // サーバー内のデータを確認する
         val db = _helper.writableDatabase
-        val sql = "SELECT * FROM GetOutTimeLogs"
-        val cursor = db.rawQuery(sql,null)
+
+        // 外出の方
+        var sql = "SELECT * FROM GetOutTimeLogs"
+        var cursor = db.rawQuery(sql,null)
 
         var log =""
         var count=0
         while (cursor.moveToNext()) {
             val idxNote = cursor.getColumnIndex("getOutTime")
+            // 所得したデータをlogに追加
             log += cursor.getString(idxNote)
             log += " "
 //            output.text = log
             count++
         }
-        Log.i("count", "count="+count)
-        val output = findViewById<TextView>(R.id.tvGetOutTime)
-        output.text = log
+        Log.i("count", "GetOutCount=" + count)
+        // tvGetOutTimeにlogのテキストを設定
+        val GOCoutput = findViewById<TextView>(R.id.tvGetOutTime)
+        GOCoutput.text = log
+
+
+        sql = "SELECT * FROM GetHomeTimeLogs"
+        cursor = db.rawQuery(sql,null)
+
+        log =""
+        count = 0 // index数を数える
+        while (cursor.moveToNext()) {
+            val idxNote = cursor.getColumnIndex("getHomeTime")
+            //　所得したデータをlogに追加
+            log += cursor.getString(idxNote)
+            log += " "
+//            output.text = log
+            count++
+        }
+        Log.i("count", "GetHomeCount=" + count)
+        // tvGetHomeTimeにlogのテキストを反映させる。
+        val GHCoutput = findViewById<TextView>(R.id.tvGetHomeTime)
+        GHCoutput.text = log
     }
 
     fun onGetOutButtonClick(view: View){
 
-        // 現在日時を表示
+        // 現在日時を所得
         val dfDate = SimpleDateFormat("yyyyMMdd")
         val dfTime = SimpleDateFormat("HHmm")
         val date = dfDate.format(Date())
@@ -95,6 +118,7 @@ class MainActivity : AppCompatActivity() {
 
         val db = _helper.writableDatabase
 
+        //　現在日時をデータベースに記述
         val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutTime) VALUES (?, ?)"
         var stmt = db.compileStatement(sqlInsert)
         //　変数のバインド
@@ -108,11 +132,26 @@ class MainActivity : AppCompatActivity() {
 
     fun onGetHomeButtonClick(view:View){
 
-        // 現在日時を表示
-        val df = SimpleDateFormat("yyyyMMdd HH:mm")
-        val date = df.format(Date())
-        val output = findViewById<TextView>(R.id.tvGetHomeTime)
-        output.text = date.toString()
+        // 現在日時を所得
+        val dfDate = SimpleDateFormat("yyyyMMdd")
+        val dfTime = SimpleDateFormat("HHmm")
+        val date = dfDate.format(Date())
+        val time = dfTime.format(Date())
+//        // 現在日時を表示
+//        val output = findViewById<TextView>(R.id.tvGetHomeTime)
+//        output.text = date.toString() + time.toString()
+
+
+        val db = _helper.writableDatabase
+
+        //　現在日時をデータベースに記述
+        val sqlInsert = "INSERT INTO GetHomeTimeLogs (getHomeDate, getHomeTime) VALUES (?, ?)"
+        var stmt = db.compileStatement(sqlInsert)
+        //　変数のバインド
+        stmt.bindString(1, date.toString())
+        stmt.bindString(2, time.toString())
+
+        stmt.executeInsert()
 
 
 
