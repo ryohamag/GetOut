@@ -16,7 +16,7 @@
             android:name=".ChartWeekActivity"
             android:exported="false" />
         <activity
-            android:name=".ChartWeek"
+            android:name=".NotificationActivity"
             android:exported="false" />
         <activity
             android:name=".ChartMonthActivity"

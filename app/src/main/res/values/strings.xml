@@ -6,4 +6,5 @@
     <string name="bt_graph">グラフ</string>
     <string name="bt_calender">カレンダー</string>
     <string name="tv_graph">グラフ表示</string>
+    <string name="tv_notification">設定</string>
 </resources>
