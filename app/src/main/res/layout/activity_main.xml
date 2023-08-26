@@ -107,17 +107,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-    <Button
-        android:id="@+id/btReload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:onClick="onReloadButtonClick"
-        android:text="Reload"
-        app:layout_constraintBottom_toTopOf="@+id/tvGetOutTime"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="parent" />
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -128,13 +117,13 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="1.0">
 
         <!-- CalendarViewを配置します。 -->
         <CalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="444dp" />
+            android:layout_height="wrap_content" />
 
         <!-- 設定ボタンを配置します。 -->
 
@@ -142,8 +131,15 @@
             android:id="@+id/btNotification"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tv_notification"
-            />
+            android:text="@string/tv_notification" />
+
+        <Button
+            android:id="@+id/btReload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:onClick="onReloadButtonClick"
+            android:text="Reload" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

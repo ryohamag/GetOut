@@ -9,4 +9,7 @@
     <string name="bt_calender">カレンダー</string>
     <string name="tv_graph">グラフ表示</string>
     <string name="tv_notification">設定</string>
+    <string name="bt_submit">submit</string>
+    <string name="tv_hour">時間</string>
+    <string name="tv_minute">分</string>
 </resources>
