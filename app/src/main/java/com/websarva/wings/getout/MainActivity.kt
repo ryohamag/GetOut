@@ -1,5 +1,6 @@
 package com.websarva.wings.getout
 
+import android.content.ContentValues
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +14,9 @@ import java.time.LocalDateTime
 import java.util.Date
 import android.widget.CalendarView
 import android.widget.Toast
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -110,6 +114,9 @@ class MainActivity : AppCompatActivity() {
         val GetHomeOutput = findViewById<TextView>(R.id.tvGetHomeTime)
         GetHomeOutput.text = log
         makeTimeLogs()
+
+        db.close()
+        timeSumLogSetUp()
     }
     fun onGetOutButtonClick(view: View){ // 外出ボタンを押したときの処理
         // もし外出状態ならば
@@ -234,10 +241,46 @@ class MainActivity : AppCompatActivity() {
             homeMinLog.add(homeCursor.getString(minIdxNote))
         }
         // 各要素にアクセスし、結果をDBに格納
-        for(i in 0..homeDateLog.size - 1){
+        for(i in 0..homeDateLog.size - 1){ //　添え字を考えて-1している。
+            //　外出時刻と帰宅時刻から、外にいた時間を計算
             val addTime = getTimeDeference(outHourLog[i], outMinLog[i], homeHourLog[i], homeMinLog[i])
             Log.i("log", "${addTime}")
         }
+    }
+    //　TimeSumLogデータベースの初期値を設定する。
+    fun timeSumLogSetUp(){
+//
+//        // データベース操作
+//        val db = _helper.writableDatabase
+//
+//        // 期間の開始と終了日を指定
+//        val startDate = "20230101"
+//        val endDate = "20231231"
+//
+//        // 日付のフォーマットを指定
+//        val dfDate = DateTimeFormatter.ofPattern("yyyyMMdd")
+//
+//
+//        val parsedStartDate = LocalDate.parse(startDate, dfDate)
+//        val parsedEndDate = LocalDate.parse(endDate, dfDate)
+//
+//        val sqlInsert = "INSERT INTO TimeSumLog (TimeSumDate, TimeSumTime) VALUES (?, ?)"
+//
+//        var currentDate = parsedStartDate
+//        while (!currentDate.isAfter(parsedEndDate)) {
+//            Log.i("calender",currentDate.format(dfDate))
+//            currentDate = currentDate.plusDays(1)
+//
+//            var stmt = db.compileStatement(sqlInsert)
+//            //　変数のバインド
+//            stmt.bindString(1, currentDate.format((dfDate)))
+//            stmt.bindString(2, "0")
+//
+//            stmt.executeInsert()
+//        }
+//
+//
+//        db.close()
     }
     // CalendarViewで日にちが選択された時に呼び出されるリスナークラス
     private inner class DateChangeListener : CalendarView.OnDateChangeListener {
