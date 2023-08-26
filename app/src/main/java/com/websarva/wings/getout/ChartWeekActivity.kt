@@ -21,26 +21,43 @@ class ChartWeekActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chart_week)
 
         val barChart: BarChart = findViewById(R.id.barChart)
+        //ここにデータをぶち込む
+        var SunData = 105
+        var MonData = 129
+        var TueData = 85
+        var WedData = 104
+        var ThuData = 52
+        var FriData = 84
+        var SatData = 114
         // X 軸ごとの Y 軸
         val entries: MutableList<Int> = mutableListOf(
-            105,
-            129,
-            85,
-            104,
-            52,
-            84,
-            114
+            SunData,
+            MonData,
+            TueData,
+            WedData,
+            ThuData,
+            FriData,
+            SatData
         )
+
+        var Sun = 1693753200000  //2023/09/03 00:00:00
+        var Mon = 1693839600000  //2023/09/04 00:00:00
+        var Tue = 1693926000000  //2023/09/05 00:00:00
+        var Wed = 1694012400000  //2023/09/06 00:00:00
+        var Thu = 1694098800000  //2023/09/07 00:00:00
+        var Fri = 1694185200000  //2023/09/08 00:00:00
+        var Sat = 1694271600000  //2023/09/09 00:00:00
+
 
         // X 軸のタイムスタンプ
         val entriesTimestampMills: MutableList<Long> = mutableListOf(
-            1614524400000,  // 2021/03/01 00:00:00
-            1614610800000,  // 2021/03/02 00:00:00
-            1614697200000,  // 2021/03/03 00:00:00
-            1614783600000,  // 2021/03/04 00:00:00
-            1614870000000,  // 2021/03/05 00:00:00
-            1614956400000,  // 2021/03/06 00:00:00
-            1615042800000   // 2021/03/07 00:00:00
+            Sun,  // 2021/09/03 00:00:00
+            Mon,  // 2021/09/04 00:00:00
+            Tue,  // 2021/09/05 00:00:00
+            Wed,  // 2021/09/06 00:00:00
+            Thu,  // 2021/09/07 00:00:00
+            Fri,  // 2023/09/08 00:00:00
+            Sat   // 2021/09/09 00:00:00
         )
 
         // グラフに描画するデータの設定
