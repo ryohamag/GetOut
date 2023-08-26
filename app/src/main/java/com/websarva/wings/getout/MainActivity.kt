@@ -1,13 +1,25 @@
 package com.websarva.wings.getout
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
+import android.util.Log
+import android.widget.TextView
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.util.Date
+import android.widget.CalendarView
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
+
+    //データベースヘルパーオブジェクトを作成
+    private val _helper = DatabaseHelper(this@MainActivity)
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
