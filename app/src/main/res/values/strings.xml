@@ -9,4 +9,6 @@
     <string name="bt_calendar">カレンダー</string>
     <string name="tv_graph">グラフ表示</string>
     <string name="tv_notification">設定</string>
+    <string name="bt_toLastWeek">先週へ</string>
+    <string name="bt_toNextWeek">来週へ</string>
 </resources>
