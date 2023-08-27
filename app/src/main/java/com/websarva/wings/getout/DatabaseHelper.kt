@@ -26,6 +26,10 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         sbGetOutLogs.append(");")
         val sqlGO = sbGetOutLogs.toString()
         db.execSQL(sqlGO)
+        // 要素がnullのみの行を挿入
+        val sqlInsertNullRow = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (null, null, null);"
+        db.execSQL(sqlInsertNullRow)
+
 
         //　帰宅日時を記録するデータベースを作成
         val sbGetHomeLogs = StringBuilder()
@@ -73,8 +77,6 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
             //　日にちを一日進める
             currentDate = currentDate.plusDays(1)
         }
-
-
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}

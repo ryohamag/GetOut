@@ -80,110 +80,184 @@ class MainActivity : AppCompatActivity() {
         var cursor = db.rawQuery(sql,null)
 
         var log =""
-        var count = 0
         while (cursor.moveToNext()) {
             val idxNote = cursor.getColumnIndex("getOutMin")
             // 所得したデータをlogに追加
             log += cursor.getString(idxNote)
             log += " "
-//            output.text = log
-            count++
         }
-        Log.i("count", "GetOutCount=" + count)
+        Log.i("count", "GetOut=" + log)
         // tvGetOutTimeにlogのテキストを設定
         val GetOutOutput = findViewById<TextView>(R.id.tvGetOutTime)
         GetOutOutput.text = log
 
 
-        // 帰宅の方
-        sql = "SELECT * FROM GetHomeTimeLogs"
-        cursor = db.rawQuery(sql,null)
-
-        log =""
-        count = 0 // index数を数える
-        while (cursor.moveToNext()) {
-            val idxNote = cursor.getColumnIndex("getHomeMin")
-            //　所得したデータをlogに追加
-            log += cursor.getString(idxNote)
-            log += " "
-//            output.text = log
-            count++
-        }
-        Log.i("count", "GetHomeCount = " + count)
-        // tvGetHomeTimeにlogのテキストを反映させる。
-        val GetHomeOutput = findViewById<TextView>(R.id.tvGetHomeTime)
-        GetHomeOutput.text = log
-        makeTimeLogs()
+//        // 帰宅の方
+//        sql = "SELECT * FROM GetHomeTimeLogs"
+//        cursor = db.rawQuery(sql,null)
+//
+//        log =""
+//        count = 0 // index数を数える
+//        while (cursor.moveToNext()) {
+//            val idxNote = cursor.getColumnIndex("getHomeMin")
+//            //　所得したデータをlogに追加
+//            log += cursor.getString(idxNote)
+//            log += " "
+////            output.text = log
+//            count++
+//        }
+//        Log.i("count", "GetHomeCount = " + count)
+//        // tvGetHomeTimeにlogのテキストを反映させる。
+//        val GetHomeOutput = findViewById<TextView>(R.id.tvGetHomeTime)
+//        GetHomeOutput.text = log
+//        makeTimeLogs()
 
         db.close()
-        timeSumLogSetUp()
     }
     fun onGetOutButtonClick(view: View){ // 外出ボタンを押したときの処理
-        // もし外出状態ならば
-        if(statusFlag === 1){
-            // 関数を終了する
-            return
-        }
-
-        // 外出フラグを立てる
-        statusFlag = 1
-
-        // 現在日時を所得
-        val dfDate = SimpleDateFormat("yyyyMMdd")
-        val dfHour = SimpleDateFormat("HH")
-        val dfMin = SimpleDateFormat("mm")
-        val date = dfDate.format(Date())
-        val hour = dfHour.format(Date())
-        val min = dfMin.format(Date())
-//        val output = findViewById<TextView>(R.id.tvGetOutTime)
-//        output.text = date.toString()+time.toString()
-
         val db = _helper.writableDatabase
 
-        //　現在日時をデータベースに記述
-        val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
-        var stmt = db.compileStatement(sqlInsert)
-        //　変数のバインド
-        stmt.bindString(1, date.toString())
-        stmt.bindString(2, hour.toString())
-        stmt.bindString(3, min.toString())
 
-        stmt.executeInsert()
+        val sql = "SELECT * FROM GetOutTimeLogs "
+        val cursor = db.rawQuery(sql, null)
 
-        Log.i("test", date)
+        while(cursor.moveToNext()) {
+            val dateIdxNote = cursor.getColumnIndex("getOutDate")
+            val hourIdxNote = cursor.getColumnIndex("getOutHour")
+            val minIdxNote = cursor.getColumnIndex("getOutMin")
+            val getOutDate = cursor.getString(dateIdxNote)
+            val getOutHour = cursor.getString(hourIdxNote)
+            val getOutMin = cursor.getString(minIdxNote)
+
+            Log.i("TAG", "${getOutDate},${getOutHour},${getOutMin}")
+
+            // DBに日付データが格納されていたら
+            if(getOutDate != null){
+                Log.i("TAG", "nullCheck")
+                // 関数を終了する
+                db.close()
+                return
+            }
+            // nullの要素を削除する～♪
+            val sqlDelete = "DELETE FROM GetOutTimeLogs"
+            var stmt = db.compileStatement(sqlDelete)
+            stmt.executeUpdateDelete()
+
+
+            // 現在日時を所得
+            val dfDate = SimpleDateFormat("yyyyMMdd")
+            val dfHour = SimpleDateFormat("HH")
+            val dfMin = SimpleDateFormat("mm")
+            val date = dfDate.format(Date())
+            val hour = dfHour.format(Date())
+            val min = dfMin.format(Date())
+
+            //　現在日時をデータベースに記述
+            val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
+            stmt = db.compileStatement(sqlInsert)
+            //　変数のバインド
+            stmt.bindString(1, date.toString())
+            stmt.bindString(2, hour.toString())
+            stmt.bindString(3, min.toString())
+
+            stmt.executeInsert()
+        }
+//
+//        // 現在日時を所得
+//        val dfDate = SimpleDateFormat("yyyyMMdd")
+//        val dfHour = SimpleDateFormat("HH")
+//        val dfMin = SimpleDateFormat("mm")
+//        val date = dfDate.format(Date())
+//        val hour = dfHour.format(Date())
+//        val min = dfMin.format(Date())
+////        val output = findViewById<TextView>(R.id.tvGetOutTime)
+////        output.text = date.toString()+time.toString()
+//
+//
+//        //　現在日時をデータベースに記述
+//        val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
+//        var stmt = db.compileStatement(sqlInsert)
+//        //　変数のバインド
+//        stmt.bindString(1, date.toString())
+//        stmt.bindString(2, hour.toString())
+//        stmt.bindString(3, min.toString())
+//
+//        stmt.executeInsert()
+
     }
     fun onGetHomeButtonClick(view:View){ // 帰宅ボタンを押したときの処理
-        // もし在宅状態ならば
-        if(statusFlag === 0){
-            // 関数を終了する
-            return
-        }
-
-        // 外出フラグを立てる
-        statusFlag = 0
-
-        // 現在日時を所得
-        val dfDate = SimpleDateFormat("yyyyMMdd")
-        val dfHour = SimpleDateFormat("HH")
-        val dfMin = SimpleDateFormat("mm")
-        val date = dfDate.format(Date())
-        val hour = dfHour.format(Date())
-        val min = dfMin.format(Date())
-//        // 現在日時を表示
-//        val output = findViewById<TextView>(R.id.tvGetHomeTime)
-//        output.text = date.toString() + time.toString()
-
         val db = _helper.writableDatabase
 
-        //　現在日時をデータベースに記述
-        val sqlInsert = "INSERT INTO GetHomeTimeLogs (getHomeDate, getHomeHour, getHomeMin) VALUES (?, ?, ?)"
-        var stmt = db.compileStatement(sqlInsert)
-        //　変数のバインド
-        stmt.bindString(1, date.toString())
-        stmt.bindString(2, hour.toString())
-        stmt.bindString(3, min.toString())
+        val sql = "SELECT * FROM GetOutTimeLogs "
+        val cursor = db.rawQuery(sql, null)
 
-        stmt.executeInsert()
+        if(cursor.moveToFirst()) {
+            Log.i("TAG", "while")
+            val dateIdxNote = cursor.getColumnIndex("getOutDate")
+            val hourIdxNote = cursor.getColumnIndex("getOutHour")
+            val minIdxNote = cursor.getColumnIndex("getOutMin")
+            val getOutDate = cursor.getString(dateIdxNote)
+            val getOutHour = cursor.getString(hourIdxNote)
+            val getOutMin = cursor.getString(minIdxNote)
+
+            Log.i("getHome", "${getOutDate},${getOutHour},${getOutMin}")
+
+            // DBに日付データが格納されていなければ
+            if (getOutDate == null) {
+                Log.i("TAG", "nullCheck")
+                // 関数を終了する
+                db.close()
+                return
+            }
+
+            // 日付を削除する～♪
+            val sqlDelete = "DELETE FROM GetOutTimeLogs"
+            var stmt = db.compileStatement(sqlDelete)
+            stmt.executeUpdateDelete()
+
+            //　nullをデータベースに記述
+            val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (null, null, null)"
+            stmt = db.compileStatement(sqlInsert)
+            stmt.executeInsert()
+
+            // 現在日時を所得
+            val dfDate = SimpleDateFormat("yyyyMMdd")
+            val dfHour = SimpleDateFormat("HH")
+            val dfMin = SimpleDateFormat("mm")
+            val date = dfDate.format(Date())
+            val hour = dfHour.format(Date())
+            val min = dfMin.format(Date())
+
+            val output = findViewById<TextView>(R.id.tvGetHomeTime)
+            output.text = hour.toString()+min.toString()
+
+
+            val sql = "SELECT * FROM TimeSumLog "
+            val cursor = db.rawQuery(sql, null)
+
+            if(cursor.moveToFirst()) {
+                val timeIdxNote = cursor.getColumnIndex("TimeSumTime")
+                val timeData = cursor.getString(timeIdxNote)
+                var timeDataInt = timeData.toInt()
+                val timeDeference = getTimeDeference(getOutHour, getOutMin, hour, min)
+                val timeDeferenceInt = timeDeference.toInt()
+
+                // 外出時間を加算
+                timeDataInt += timeDeferenceInt
+                Log.i("TAG", "timeDataInt = ${timeDataInt}")
+
+                //　データベースに記述
+                val sqlUpdate = "UPDATE TimeSumLog SET TimeSumDate = ? , TimeSumTime = ?"
+                stmt = db.compileStatement(sqlUpdate)
+                //　変数のバインド
+                stmt.bindString(1, date)
+                stmt.bindString(2, timeDataInt.toString())
+                stmt.execute()
+
+
+            }
+        }
+        db.close()
     }
 
     // 時間データから経過時間を計算する関数、返り値は分
