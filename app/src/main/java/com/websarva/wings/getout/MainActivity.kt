@@ -1,22 +1,23 @@
 package com.websarva.wings.getout
 
-import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.Button
 import android.util.Log
-import android.widget.TextView
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.util.Date
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.CalendarView
+import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,14 +29,26 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val calendarListView = findViewById<ListView>(R.id.calendarListView)
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentMonth = calendar.get(Calendar.MONTH)
 
-        // CalendarViewに現在日時を設定します。
-        val calendarView = findViewById<CalendarView>(R.id.calendarView)
-        calendarView.date = System.currentTimeMillis()
 
-        // CalendarViewで日にちが選択された時に呼び出されるリスナー
-        val listener = DateChangeListener()
-        calendarView.setOnDateChangeListener(listener)
+        val allMonths = generateAllMonths()
+        val adapter = CalendarAdapter(this, allMonths[currentMonth]) // currentMonth には表示したい月の番号を入れる
+        calendarListView.adapter = adapter
+
+
+
+
+
+
+
+        calendarListView.adapter = adapter
+
+
+
 
         val btNotification = findViewById<Button>(R.id.btNotification)
         //ボタンクリックのリスナーを設定。
@@ -65,6 +78,28 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent2ChartWeek)
         }
     }
+    private fun generateAllMonths(): List<List<String>> {
+        val allMonths = mutableListOf<List<String>>()
+        val calendar = Calendar.getInstance()
+
+        for (month in Calendar.JANUARY..Calendar.DECEMBER) {
+            calendar.set(Calendar.MONTH, month)
+            val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+            val monthDates = mutableListOf<String>()
+
+            for (day in 1..daysInMonth) {
+                calendar.set(Calendar.DAY_OF_MONTH, day)
+                val formattedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+                monthDates.add(formattedDate)
+            }
+
+            allMonths.add(monthDates)
+        }
+
+        return allMonths
+    }
+
+
 
     override fun onDestroy() {
         _helper.close()
@@ -366,4 +401,20 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+}
+class CalendarAdapter(context: Context, private val dates: List<String>) : ArrayAdapter<String>(context, 0, dates) {
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        var convertView = convertView
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.list_item_calendar, parent, false)
+        }
+
+        val date = getItem(position)
+
+        val dateTextView = convertView!!.findViewById<TextView>(R.id.dateTextView)
+        dateTextView.text = date
+
+        return convertView
+    }
 }

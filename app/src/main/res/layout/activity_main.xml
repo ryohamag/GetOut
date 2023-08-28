@@ -120,11 +120,10 @@
         app:layout_constraintVertical_bias="1.0">
 
         <!-- CalendarViewを配置します。 -->
-        <CalendarView
-            android:id="@+id/calendarView"
+        <ListView
+            android:id="@+id/calendarListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+            android:layout_height="322dp" />
         <!-- 設定ボタンを配置します。 -->
 
         <Button
@@ -140,6 +139,7 @@
             android:layout_marginBottom="8dp"
             android:onClick="onReloadButtonClick"
             android:text="Reload" />
+
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
