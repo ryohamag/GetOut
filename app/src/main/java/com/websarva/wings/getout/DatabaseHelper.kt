@@ -52,12 +52,16 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         db.execSQL(sqlTS)
 
 
+        // 外出時間サンプルを作成
+        val dfTime = DateTimeFormatter.ofPattern("Md")
+
+
         // 期間の開始と終了日を指定
-        val startDate = "20230101"
-        val endDate = "20231231"
+        val startDate = "2023-1-1"
+        val endDate = "2023-12-31"
 
         // 日付のフォーマットを指定
-        val dfDate = DateTimeFormatter.ofPattern("yyyyMMdd")
+        val dfDate = DateTimeFormatter.ofPattern("yyyy-M-d")
 
         val parsedStartDate = LocalDate.parse(startDate, dfDate)
         val parsedEndDate = LocalDate.parse(endDate, dfDate)
@@ -69,7 +73,7 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         while (!currentDate.isAfter(parsedEndDate)) {
             val values = ContentValues()
             values.put("TimeSumDate", currentDate.format(dfDate))
-            values.put("TimeSumTime", "0")
+            values.put("TimeSumTime", currentDate.format(dfTime))
 
             //　日付と外出時間＝０を挿入
             db.insert("TimeSumLog", null, values)

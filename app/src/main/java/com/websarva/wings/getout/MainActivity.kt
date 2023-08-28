@@ -21,9 +21,6 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
-    // 帰宅状態：０　外出状態：１を示すフラグ
-    var statusFlag = 0
-
     //データベースヘルパーオブジェクトを作成
     private val _helper = DatabaseHelper(this@MainActivity)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,6 +124,17 @@ class MainActivity : AppCompatActivity() {
         GetOutOutput.text = log
 
 
+        cursor = db.rawQuery("SELECT * FROM TimeSumLog", null)
+
+        while (cursor.moveToNext()) {
+            var dataColumnIndex = cursor.getColumnIndex("TimeSumDate")
+            var data = cursor.getString(dataColumnIndex)
+            Log.i("DatabaseData", "Data: $data")
+            dataColumnIndex = cursor.getColumnIndex("TimeSumTime")
+            data = cursor.getString(dataColumnIndex)
+            Log.i("DatabaseData", "Data: $data")
+        }
+
 //        // 帰宅の方
 //        sql = "SELECT * FROM GetHomeTimeLogs"
 //        cursor = db.rawQuery(sql,null)
@@ -180,7 +188,7 @@ class MainActivity : AppCompatActivity() {
 
 
             // 現在日時を所得
-            val dfDate = SimpleDateFormat("yyyyMMdd")
+            val dfDate = SimpleDateFormat("yyyy-M-d")
             val dfHour = SimpleDateFormat("HH")
             val dfMin = SimpleDateFormat("mm")
             val date = dfDate.format(Date())
@@ -220,14 +228,17 @@ class MainActivity : AppCompatActivity() {
 //        stmt.executeInsert()
 
     }
-    fun onGetHomeButtonClick(view:View){ // 帰宅ボタンを押したときの処理
+    // 帰宅ボタンを押したときの処理
+    fun onGetHomeButtonClick(view:View){
         val db = _helper.writableDatabase
 
+        // 外出時刻を所得
         val sql = "SELECT * FROM GetOutTimeLogs "
         val cursor = db.rawQuery(sql, null)
 
+        //　GetOutTimeLogは一行しかないからmoveToFirstを使用
         if(cursor.moveToFirst()) {
-            Log.i("TAG", "while")
+            // それぞれの要素を所得
             val dateIdxNote = cursor.getColumnIndex("getOutDate")
             val hourIdxNote = cursor.getColumnIndex("getOutHour")
             val minIdxNote = cursor.getColumnIndex("getOutMin")
@@ -237,7 +248,7 @@ class MainActivity : AppCompatActivity() {
 
             Log.i("getHome", "${getOutDate},${getOutHour},${getOutMin}")
 
-            // DBに日付データが格納されていなければ
+            // 外出時刻のデータが格納されていなければ（nullか否かで判定します。）
             if (getOutDate == null) {
                 Log.i("TAG", "nullCheck")
                 // 関数を終了する
@@ -245,32 +256,38 @@ class MainActivity : AppCompatActivity() {
                 return
             }
 
-            // 日付を削除する～♪
+            // DBに外出時刻データが格納されていれば日付を削除する～♪
             val sqlDelete = "DELETE FROM GetOutTimeLogs"
             var stmt = db.compileStatement(sqlDelete)
             stmt.executeUpdateDelete()
 
-            //　nullをデータベースに記述
+            //　nullをデータベースに記述（帰宅したので再び外出できるようにする）
             val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (null, null, null)"
             stmt = db.compileStatement(sqlInsert)
             stmt.executeInsert()
 
             // 現在日時を所得
-            val dfDate = SimpleDateFormat("yyyyMMdd")
+            val dfDate = SimpleDateFormat("yyyy-M-d")
             val dfHour = SimpleDateFormat("HH")
             val dfMin = SimpleDateFormat("mm")
             val date = dfDate.format(Date())
             val hour = dfHour.format(Date())
             val min = dfMin.format(Date())
 
+            // 帰宅ボタンの上に所得した現在時刻を表示（不要）
             val output = findViewById<TextView>(R.id.tvGetHomeTime)
             output.text = hour.toString()+min.toString()
 
+//            // TimeSumLogからデータを所得
+//            val sql = "SELECT * FROM TimeSumLog "
+//            val cursor = db.rawQuery(sql, null)
 
-            val sql = "SELECT * FROM TimeSumLog "
-            val cursor = db.rawQuery(sql, null)
+            // TimeSumLogからデータを所得
+            val sql = "SELECT * FROM TimeSumLog WHERE TimeSumDate = ?"
+            val selectionArgs = arrayOf(date)
+            val cursor = db.rawQuery(sql, selectionArgs)
 
-            if(cursor.moveToFirst()) {
+            while(cursor.moveToNext()) {
                 val timeIdxNote = cursor.getColumnIndex("TimeSumTime")
                 val timeData = cursor.getString(timeIdxNote)
                 var timeDataInt = timeData.toInt()
@@ -278,15 +295,16 @@ class MainActivity : AppCompatActivity() {
                 val timeDeferenceInt = timeDeference.toInt()
 
                 // 外出時間を加算
+                Log.i("TAG", "timeDataInt = $timeDataInt, timeDeferenceInt = $timeDeferenceInt")
                 timeDataInt += timeDeferenceInt
                 Log.i("TAG", "timeDataInt = ${timeDataInt}")
 
                 //　データベースに記述
-                val sqlUpdate = "UPDATE TimeSumLog SET TimeSumDate = ? , TimeSumTime = ?"
+                val sqlUpdate = "UPDATE TimeSumLog SET TimeSumTime = ? WHERE TimeSumDate = ?"
                 stmt = db.compileStatement(sqlUpdate)
                 //　変数のバインド
-                stmt.bindString(1, date)
-                stmt.bindString(2, timeDataInt.toString())
+                stmt.bindString(1, timeDataInt.toString())
+                stmt.bindString(2, date)
                 stmt.execute()
 
 
@@ -310,6 +328,15 @@ class MainActivity : AppCompatActivity() {
 
         //　返り値の単位は分
         return timeDeference.toString()
+    }
+    // 分を時間と分に変換する関数
+    fun minToHour(min: String): String {
+        // StringをIntに変換
+        val minInt = min.toInt()
+        val outputHour = minInt / 60
+        val outputMin = minInt % 60
+        val output = "${outputHour}時間${outputMin}分"
+        return output
     }
     // 外出帰宅時間からその日の総外出時間をDBに格納。外出、帰宅DBの要素数がそろっているときに実行してね♪
     // 日付またぎ未実装
@@ -350,53 +377,39 @@ class MainActivity : AppCompatActivity() {
             homeMinLog.add(homeCursor.getString(minIdxNote))
         }
         // 各要素にアクセスし、結果をDBに格納
-        for(i in 0..homeDateLog.size - 1){ //　添え字を考えて-1している。
+        for(i in 0..homeDateLog.size - 1){ //　添え字は0からなので-1している。
             //　外出時刻と帰宅時刻から、外にいた時間を計算
             val addTime = getTimeDeference(outHourLog[i], outMinLog[i], homeHourLog[i], homeMinLog[i])
             Log.i("log", "${addTime}")
         }
     }
-    //　TimeSumLogデータベースの初期値を設定する。
-    fun timeSumLogSetUp(){
-//
-//        // データベース操作
-//        val db = _helper.writableDatabase
-//
-//        // 期間の開始と終了日を指定
-//        val startDate = "20230101"
-//        val endDate = "20231231"
-//
-//        // 日付のフォーマットを指定
-//        val dfDate = DateTimeFormatter.ofPattern("yyyyMMdd")
-//
-//
-//        val parsedStartDate = LocalDate.parse(startDate, dfDate)
-//        val parsedEndDate = LocalDate.parse(endDate, dfDate)
-//
-//        val sqlInsert = "INSERT INTO TimeSumLog (TimeSumDate, TimeSumTime) VALUES (?, ?)"
-//
-//        var currentDate = parsedStartDate
-//        while (!currentDate.isAfter(parsedEndDate)) {
-//            Log.i("calender",currentDate.format(dfDate))
-//            currentDate = currentDate.plusDays(1)
-//
-//            var stmt = db.compileStatement(sqlInsert)
-//            //　変数のバインド
-//            stmt.bindString(1, currentDate.format((dfDate)))
-//            stmt.bindString(2, "0")
-//
-//            stmt.executeInsert()
-//        }
-//
-//
-//        db.close()
-    }
     // CalendarViewで日にちが選択された時に呼び出されるリスナークラス
     private inner class DateChangeListener : CalendarView.OnDateChangeListener {
         override fun onSelectedDayChange(calendarView: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
+
             // monthは0起算のため+1します。
             val displayMonth = month + 1
-            Toast.makeText(applicationContext, "$year/$displayMonth/$dayOfMonth", Toast.LENGTH_LONG).show()
+            // DBの日付検索用文字列を作成
+            var selectedDate = "$year-$displayMonth-$dayOfMonth"
+            Log.i("TAG", "$selectedDate")
+
+            val db = _helper.writableDatabase
+
+            // TimeSumLogからデータを所得
+            val sql = "SELECT * FROM TimeSumLog WHERE TimeSumDate = ?"
+            val selectionArgs = arrayOf(selectedDate)
+            val cursor = db.rawQuery(sql, selectionArgs)
+
+            while(cursor.moveToNext()) {
+                var timeIdxNote = cursor.getColumnIndex("TimeSumDate")
+                var timeData = cursor.getString(timeIdxNote)
+                Log.i("TAG", "$timeData")
+                timeIdxNote = cursor.getColumnIndex("TimeSumTime")
+                timeData = cursor.getString(timeIdxNote)
+                Log.i("TAG", "$timeData")
+                Toast.makeText(applicationContext, "${minToHour(timeData)}", Toast.LENGTH_LONG).show()
+            }
+            db.close()
         }
     }
 
