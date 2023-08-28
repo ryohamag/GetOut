@@ -126,6 +126,10 @@ class ChartWeekActivity : AppCompatActivity() {
         val btToLastWeek = findViewById<Button>(R.id.btToLastWeek)
         //「先週へ」ボタンにリスナを設定。
         btToLastWeek.setOnClickListener(listener)
+
+        val listenernw = ToWeekListener(this)
+        val btToNextWeek = findViewById<Button>(R.id.btToNextWeek)
+        btToNextWeek.setOnClickListener(listenernw)
     }
 
 
@@ -143,19 +147,23 @@ class ChartWeekActivity : AppCompatActivity() {
         return labels.reversed()
     }
 
+    private fun getNext7DaysLabels(): List<String> {
+        val labels = ArrayList<String>()
+        val calendar = Calendar.getInstance()
+
+        for (i in 1 ..7) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            labels.add(dateFormatter.format(calendar.time))
+        }
+
+        return labels
+    }
+
     private inner class ToWeekListener(private val activity: ChartWeekActivity): View.OnClickListener {
         override fun onClick(view: View){
             val barChart: BarChart = activity.findViewById(R.id.barChart)
             when(view.id){
                 R.id.btToLastWeek -> {
-                    activity.Sun -= 604800000
-                    activity.Mon -= 604800000
-                    activity.Tue -= 604800000
-                    activity.Wed -= 604800000
-                    activity.Thu -= 604800000
-                    activity.Fri -= 604800000
-                    activity.Sat -= 604800000
-
                     // 新しいデータを作成
                     val newEntries: MutableList<Int> = mutableListOf(
                         activity.SunData,
@@ -191,7 +199,45 @@ class ChartWeekActivity : AppCompatActivity() {
                     // グラフ描画
                     barChart.invalidate()
                 }
+                R.id.btToNextWeek -> {
+                    // 新しいデータを作成
+                    val newEntries: MutableList<Int> = mutableListOf(
+                        activity.SunData,
+                        activity.MonData,
+                        activity.TueData,
+                        activity.WedData,
+                        activity.ThuData,
+                        activity.FriData,
+                        activity.SatData
+                    )
+
+                    val newEntryList = newEntries.mapIndexed { index, entry ->
+                        BarEntry(
+                            index.toFloat(),
+                            entry.toFloat()
+                        )
+                    }
+
+                    // データを更新して再描画
+                    val newBarDataSet = BarDataSet(newEntryList, "barChart")
+                    newBarDataSet.setDrawValues(false)
+                    val newBarData = BarData(mutableListOf<IBarDataSet>(newBarDataSet))
+
+                    // 新しいデータを設定
+                    barChart.data = newBarData
+
+                    barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getNext7DaysLabels())
+
+                    // データが変更されたことを通知
+                    barChart.data.notifyDataChanged()
+                    barChart.notifyDataSetChanged()
+
+                    // グラフ描画
+                    barChart.invalidate()
+                }
             }
         }
     }
+
+
 }
