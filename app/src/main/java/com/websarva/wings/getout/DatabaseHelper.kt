@@ -17,48 +17,46 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
 
     override fun onCreate(db: SQLiteDatabase) {
         //　外出日時を記録するデータベースを作成
-        val sbGetOutLogs = StringBuilder()
-        sbGetOutLogs.append("CREATE TABLE GetOutTimeLogs(")
-//        sbGetOutLogs.append("_id INTEGER PRIMARY KEY,")
-        sbGetOutLogs.append("getOutDate TEXT,")
-        sbGetOutLogs.append("getOutHour TEXT,")
-        sbGetOutLogs.append("getOutMin TEXT")
-        sbGetOutLogs.append(");")
-        val sqlGO = sbGetOutLogs.toString()
+        val sbGetOutLog = StringBuilder()
+        sbGetOutLog.append("CREATE TABLE GetOutTimeLog(")
+        sbGetOutLog.append("getOutDate TEXT,")
+        sbGetOutLog.append("getOutHour TEXT,")
+        sbGetOutLog.append("getOutMin TEXT")
+        sbGetOutLog.append(");")
+        val sqlGO = sbGetOutLog.toString()
         db.execSQL(sqlGO)
         // 要素がnullのみの行を挿入
-        val sqlInsertNullRow = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (null, null, null);"
+        val sqlInsertNullRow = "INSERT INTO GetOutTimeLog (getOutDate, getOutHour, getOutMin) VALUES (null, null, null);"
         db.execSQL(sqlInsertNullRow)
 
 
-        //　帰宅日時を記録するデータベースを作成
-        val sbGetHomeLogs = StringBuilder()
-        sbGetHomeLogs.append("CREATE TABLE GetHomeTimeLogs(")
-//        sbGetHomeLogs.append("_id INTEGER PRIMARY KEY,")
-        sbGetHomeLogs.append("getHomeDate TEXT,")
-        sbGetHomeLogs.append("getHomeHour TEXT,")
-        sbGetHomeLogs.append("getHomeMin TEXT")
-        sbGetHomeLogs.append(");")
-        val sqlGH = sbGetHomeLogs.toString()
-        db.execSQL(sqlGH)
+//        //　帰宅日時を記録するデータベースを作成
+//        val sbGetHomeLogs = StringBuilder()
+//        sbGetHomeLogs.append("CREATE TABLE GetHomeTimeLogs(")
+//        sbGetHomeLogs.append("getHomeDate TEXT,")
+//        sbGetHomeLogs.append("getHomeHour TEXT,")
+//        sbGetHomeLogs.append("getHomeMin TEXT")
+//        sbGetHomeLogs.append(");")
+//        val sqlGH = sbGetHomeLogs.toString()
+//        db.execSQL(sqlGH)
 
         // 合計外出時間を記録するデータベースを作成
         val sbTimeSumLog = StringBuilder()
         sbTimeSumLog.append("CREATE TABLE TimeSumLog(")
-        sbTimeSumLog.append("TimeSumDate TEXT,")
-        sbTimeSumLog.append("TimeSumTime TEXT")
+        sbTimeSumLog.append("Date TEXT,")
+        sbTimeSumLog.append("Time TEXT")
         sbTimeSumLog.append(");")
         val sqlTS = sbTimeSumLog.toString()
         db.execSQL(sqlTS)
 
 
-        // 外出時間サンプルを作成
-        val dfTime = DateTimeFormatter.ofPattern("Md")
-
 
         // 期間の開始と終了日を指定
         val startDate = "2023-1-1"
         val endDate = "2023-12-31"
+
+        // 外出時間サンプルのフォーマットを指定
+        val dfTime = DateTimeFormatter.ofPattern("Md")
 
         // 日付のフォーマットを指定
         val dfDate = DateTimeFormatter.ofPattern("yyyy-M-d")
@@ -72,8 +70,8 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         // 日付が終了日より前の間
         while (!currentDate.isAfter(parsedEndDate)) {
             val values = ContentValues()
-            values.put("TimeSumDate", currentDate.format(dfDate))
-            values.put("TimeSumTime", currentDate.format(dfTime))
+            values.put("Date", currentDate.format(dfDate))
+            values.put("Time", currentDate.format(dfTime))
 
             //　日付と外出時間＝０を挿入
             db.insert("TimeSumLog", null, values)
