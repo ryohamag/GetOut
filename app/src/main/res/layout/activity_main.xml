@@ -140,6 +140,5 @@
             android:onClick="onReloadButtonClick"
             android:text="Reload" />
 
-
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
