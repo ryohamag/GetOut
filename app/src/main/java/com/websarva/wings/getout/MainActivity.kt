@@ -28,13 +28,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // CalendarViewに現在日時を設定します。
-        val calendarView = findViewById<CalendarView>(R.id.calendarView)
-        calendarView.date = System.currentTimeMillis()
-
-        // CalendarViewで日にちが選択された時に呼び出されるリスナー
-        val listener = DateChangeListener()
-        calendarView.setOnDateChangeListener(listener)
+//        // CalendarViewに現在日時を設定します。
+//        val calendarView = findViewById<CalendarView>(R.id.calendarView)
+//        calendarView.date = System.currentTimeMillis()
+//
+//        // CalendarViewで日にちが選択された時に呼び出されるリスナー
+//        val listener = DateChangeListener()
+//        calendarView.setOnDateChangeListener(listener)
 
         val btNotification = findViewById<Button>(R.id.btNotification)
         //ボタンクリックのリスナーを設定。
