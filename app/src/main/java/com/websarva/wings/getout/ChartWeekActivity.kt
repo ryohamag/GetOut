@@ -1,9 +1,11 @@
 package com.websarva.wings.getout
 
 import android.annotation.SuppressLint
+import android.app.Notification.CarExtender
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import com.github.mikephil.charting.charts.BarChart
@@ -15,19 +17,24 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.*
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 class ChartWeekActivity : AppCompatActivity() {
-    var Sun: Long = 1693753200000  //2023/09/03 00:00:00
-    var Mon: Long = 1693839600000  //2023/09/04 00:00:00
-    var Tue: Long = 1693926000000  //2023/09/05 00:00:00
-    var Wed: Long = 1694012400000  //2023/09/06 00:00:00
-    var Thu: Long = 1694098800000  //2023/09/07 00:00:00
-    var Fri: Long = 1694185200000  //2023/09/08 00:00:00
-    var Sat: Long = 1694271600000  //2023/09/09 00:00:00
+
+    // 参照する日付を格納する変数
+    var referencedDate = Calendar.getInstance()
+
+    var Sun: Instant = Instant.now()
+    var Mon: Instant = Sun.plusSeconds(86400)
+    var Tue: Instant = Sun.plusSeconds(86400*2)
+    var Wed: Instant = Sun.plusSeconds(86400*3)
+    var Thu: Instant = Sun.plusSeconds(86400*4)
+    var Fri: Instant = Sun.plusSeconds(86400*5)
+    var Sat: Instant = Sun.plusSeconds(86400*6)
 
     var SunData = 105
     var MonData = 129
@@ -56,7 +63,7 @@ class ChartWeekActivity : AppCompatActivity() {
 
 
         // X 軸のタイムスタンプ
-        val entriesTimestampMills: MutableList<Long> = mutableListOf(
+        val entriesTimestampMills: MutableList<Instant> = mutableListOf(
             Sun,  // 2021/09/03 00:00:00
             Mon,  // 2021/09/04 00:00:00
             Tue,  // 2021/09/05 00:00:00
@@ -94,7 +101,7 @@ class ChartWeekActivity : AppCompatActivity() {
                 // value には 0, 1, 2... という index が入ってくるので
                 // index からタイムスタンプを取得する
                 val timestampMills = entriesTimestampMills[value.toInt()]
-                val date = Date(timestampMills)
+                val date = Date(timestampMills.toEpochMilli())
                 return simpleDateFormat.format(date)
             }
         }
@@ -133,28 +140,33 @@ class ChartWeekActivity : AppCompatActivity() {
     }
 
 
-    private val dateFormatter = SimpleDateFormat("MM/dd", Locale.getDefault())
+    private val dateFormatter = SimpleDateFormat("M/d", Locale.getDefault())
 
-    private fun getLast7DaysLabels(): List<String> {
+    private fun getLast7DaysLabels(referencedDate: Calendar): List<String> {
         val labels = ArrayList<String>()
-        val calendar = Calendar.getInstance()
+        val calendar = referencedDate
+        calendar.add(Calendar.DAY_OF_YEAR, -8)
 
-        for (i in 6 downTo 0) {
-            calendar.add(Calendar.DAY_OF_YEAR, -1)
-            labels.add(dateFormatter.format(calendar.time))
-        }
-
-        return labels.reversed()
-    }
-
-    private fun getNext7DaysLabels(): List<String> {
-        val labels = ArrayList<String>()
-        val calendar = Calendar.getInstance()
-
-        for (i in 1 ..7) {
+        for (i in 0 .. 6) {
             calendar.add(Calendar.DAY_OF_YEAR, 1)
             labels.add(dateFormatter.format(calendar.time))
         }
+        calendar.add(Calendar.DAY_OF_YEAR, -6)
+
+        return labels
+    }
+
+    private fun getNext7DaysLabels(referencedDate: Calendar): List<String> {
+        val labels = ArrayList<String>()
+//        val calendar = Calendar.getInstance()
+        var calendar = referencedDate
+        calendar.add(Calendar.DAY_OF_YEAR, 6)
+
+        for (i in 0 .. 6) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            labels.add(dateFormatter.format(calendar.time))
+        }
+        calendar.add(Calendar.DAY_OF_YEAR, -6)
 
         return labels
     }
@@ -190,7 +202,9 @@ class ChartWeekActivity : AppCompatActivity() {
                     // 新しいデータを設定
                     barChart.data = newBarData
 
-                    barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getLast7DaysLabels())
+                    Log.i("TAG", "${referencedDate.time}")
+                    barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getLast7DaysLabels(referencedDate))
+//                    referencedDate.add(Calendar.DAY_OF_YEAR, -1)
 
                     // データが変更されたことを通知
                     barChart.data.notifyDataChanged()
@@ -200,6 +214,14 @@ class ChartWeekActivity : AppCompatActivity() {
                     barChart.invalidate()
                 }
                 R.id.btToNextWeek -> {
+                    // 新しい日付を計算
+                    activity.Sun = activity.Sun.plusSeconds(86400 * 7)
+                    activity.Mon = activity.Mon.plusSeconds(86400 * 7)
+                    activity.Tue = activity.Tue.plusSeconds(86400 * 7)
+                    activity.Wed = activity.Wed.plusSeconds(86400 * 7)
+                    activity.Thu = activity.Thu.plusSeconds(86400 * 7)
+                    activity.Fri = activity.Fri.plusSeconds(86400 * 7)
+                    activity.Sat = activity.Sat.plusSeconds(86400 * 7)
                     // 新しいデータを作成
                     val newEntries: MutableList<Int> = mutableListOf(
                         activity.SunData,
@@ -226,7 +248,9 @@ class ChartWeekActivity : AppCompatActivity() {
                     // 新しいデータを設定
                     barChart.data = newBarData
 
-                    barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getNext7DaysLabels())
+                    Log.i("TAG", "${referencedDate.time}")
+//                    referencedDate.add(Calendar.DAY_OF_YEAR, 7)
+                    barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getNext7DaysLabels(referencedDate))
 
                     // データが変更されたことを通知
                     barChart.data.notifyDataChanged()
