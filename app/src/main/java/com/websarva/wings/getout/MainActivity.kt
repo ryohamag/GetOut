@@ -37,17 +37,8 @@ class MainActivity : AppCompatActivity() {
 
         val dates = generateDatesInRange(startDate, endDate)
         val adapter = CalendarAdapter(this, dates)
-        calendarListView.adapter = adapter
-
-
-
-
-
 
         calendarListView.adapter = adapter
-
-
-
 
         val btNotification = findViewById<Button>(R.id.btNotification)
         //ボタンクリックのリスナーを設定。
@@ -141,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         val db = _helper.writableDatabase
 
 
-        val sql = "SELECT * FROM GetOutTimeLogs "
+        val sql = "SELECT * FROM GetOutTimeLog "
         val cursor = db.rawQuery(sql, null)
 
         while(cursor.moveToNext()) {
@@ -313,6 +304,23 @@ class MainActivity : AppCompatActivity() {
             stmt.bindString(2, date)
             stmt.execute()
         }
+    }
+
+    // YYYY-M-d形式の日付から総外出時間を所得する
+    fun getTime(date: String): String{
+        val db = _helper.writableDatabase
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        var timeData = ""
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        return timeData
     }
 
     // ex)　入力：97　→　出力：1時間37分
