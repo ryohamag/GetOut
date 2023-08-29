@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         val db = _helper.writableDatabase
 
         // 外出の方
-        var sql = "SELECT * FROM GetOutTimeLogs"
+        var sql = "SELECT * FROM GetOutTimeLog"
         var cursor = db.rawQuery(sql,null)
 
         var log =""
@@ -92,10 +92,10 @@ class MainActivity : AppCompatActivity() {
         cursor = db.rawQuery("SELECT * FROM TimeSumLog", null)
 
         while (cursor.moveToNext()) {
-            var dataColumnIndex = cursor.getColumnIndex("TimeSumDate")
+            var dataColumnIndex = cursor.getColumnIndex("Date")
             var data = cursor.getString(dataColumnIndex)
             Log.i("DatabaseData", "Data: $data")
-            dataColumnIndex = cursor.getColumnIndex("TimeSumTime")
+            dataColumnIndex = cursor.getColumnIndex("Time")
             data = cursor.getString(dataColumnIndex)
             Log.i("DatabaseData", "Data: $data")
         }
@@ -125,19 +125,19 @@ class MainActivity : AppCompatActivity() {
     fun onGetOutButtonClick(view: View){ // 外出ボタンを押したときの処理
         val db = _helper.writableDatabase
 
-
-        val sql = "SELECT * FROM GetOutTimeLogs "
+        // GetOutTimeLogsからデータを所得
+        val sql = "SELECT * FROM GetOutTimeLog "
         val cursor = db.rawQuery(sql, null)
 
         while(cursor.moveToNext()) {
             val dateIdxNote = cursor.getColumnIndex("getOutDate")
-            val hourIdxNote = cursor.getColumnIndex("getOutHour")
-            val minIdxNote = cursor.getColumnIndex("getOutMin")
+//            val hourIdxNote = cursor.getColumnIndex("getOutHour")
+//            val minIdxNote = cursor.getColumnIndex("getOutMin")
             val getOutDate = cursor.getString(dateIdxNote)
-            val getOutHour = cursor.getString(hourIdxNote)
-            val getOutMin = cursor.getString(minIdxNote)
+//            val getOutHour = cursor.getString(hourIdxNote)
+//            val getOutMin = cursor.getString(minIdxNote)
 
-            Log.i("TAG", "${getOutDate},${getOutHour},${getOutMin}")
+//            Log.i("TAG", "${getOutDate},${getOutHour},${getOutMin}")
 
             // DBに日付データが格納されていたら
             if(getOutDate != null){
@@ -147,10 +147,9 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             // nullの要素を削除する～♪
-            val sqlDelete = "DELETE FROM GetOutTimeLogs"
+            val sqlDelete = "DELETE FROM GetOutTimeLog"
             var stmt = db.compileStatement(sqlDelete)
             stmt.executeUpdateDelete()
-
 
             // 現在日時を所得
             val dfDate = SimpleDateFormat("yyyy-M-d")
@@ -161,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             val min = dfMin.format(Date())
 
             //　現在日時をデータベースに記述
-            val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
+            val sqlInsert = "INSERT INTO GetOutTimeLog (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
             stmt = db.compileStatement(sqlInsert)
             //　変数のバインド
             stmt.bindString(1, date.toString())
@@ -170,35 +169,13 @@ class MainActivity : AppCompatActivity() {
 
             stmt.executeInsert()
         }
-//
-//        // 現在日時を所得
-//        val dfDate = SimpleDateFormat("yyyyMMdd")
-//        val dfHour = SimpleDateFormat("HH")
-//        val dfMin = SimpleDateFormat("mm")
-//        val date = dfDate.format(Date())
-//        val hour = dfHour.format(Date())
-//        val min = dfMin.format(Date())
-////        val output = findViewById<TextView>(R.id.tvGetOutTime)
-////        output.text = date.toString()+time.toString()
-//
-//
-//        //　現在日時をデータベースに記述
-//        val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
-//        var stmt = db.compileStatement(sqlInsert)
-//        //　変数のバインド
-//        stmt.bindString(1, date.toString())
-//        stmt.bindString(2, hour.toString())
-//        stmt.bindString(3, min.toString())
-//
-//        stmt.executeInsert()
-
     }
     // 帰宅ボタンを押したときの処理
     fun onGetHomeButtonClick(view:View){
         val db = _helper.writableDatabase
 
         // 外出時刻を所得
-        val sql = "SELECT * FROM GetOutTimeLogs "
+        val sql = "SELECT * FROM GetOutTimeLog "
         val cursor = db.rawQuery(sql, null)
 
         //　GetOutTimeLogは一行しかないからmoveToFirstを使用
@@ -222,12 +199,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             // DBに外出時刻データが格納されていれば日付を削除する～♪
-            val sqlDelete = "DELETE FROM GetOutTimeLogs"
+            val sqlDelete = "DELETE FROM GetOutTimeLog"
             var stmt = db.compileStatement(sqlDelete)
             stmt.executeUpdateDelete()
 
             //　nullをデータベースに記述（帰宅したので再び外出できるようにする）
-            val sqlInsert = "INSERT INTO GetOutTimeLogs (getOutDate, getOutHour, getOutMin) VALUES (null, null, null)"
+            val sqlInsert = "INSERT INTO GetOutTimeLog (getOutDate, getOutHour, getOutMin) VALUES (null, null, null)"
             stmt = db.compileStatement(sqlInsert)
             stmt.executeInsert()
 
@@ -235,45 +212,42 @@ class MainActivity : AppCompatActivity() {
             val dfDate = SimpleDateFormat("yyyy-M-d")
             val dfHour = SimpleDateFormat("HH")
             val dfMin = SimpleDateFormat("mm")
-            val date = dfDate.format(Date())
-            val hour = dfHour.format(Date())
-            val min = dfMin.format(Date())
+            val getHomeDate = dfDate.format(Date())
+            val getHomeHour = dfHour.format(Date())
+            val getHomeMin = dfMin.format(Date())
 
-            // 帰宅ボタンの上に所得した現在時刻を表示（不要）
+            // 帰宅ボタンの上に所得した現在時刻を表示
             val output = findViewById<TextView>(R.id.tvGetHomeTime)
-            output.text = hour.toString()+min.toString()
+            output.text = getHomeHour.toString() + getHomeMin.toString()
+
+            // 今日の日付に外出時間を加算
+            addTime(getHomeDate, getTimeDeference(getOutHour, getOutMin, getHomeHour, getHomeMin))
 
 //            // TimeSumLogからデータを所得
-//            val sql = "SELECT * FROM TimeSumLog "
-//            val cursor = db.rawQuery(sql, null)
-
-            // TimeSumLogからデータを所得
-            val sql = "SELECT * FROM TimeSumLog WHERE TimeSumDate = ?"
-            val selectionArgs = arrayOf(date)
-            val cursor = db.rawQuery(sql, selectionArgs)
-
-            while(cursor.moveToNext()) {
-                val timeIdxNote = cursor.getColumnIndex("TimeSumTime")
-                val timeData = cursor.getString(timeIdxNote)
-                var timeDataInt = timeData.toInt()
-                val timeDeference = getTimeDeference(getOutHour, getOutMin, hour, min)
-                val timeDeferenceInt = timeDeference.toInt()
-
-                // 外出時間を加算
-                Log.i("TAG", "timeDataInt = $timeDataInt, timeDeferenceInt = $timeDeferenceInt")
-                timeDataInt += timeDeferenceInt
-                Log.i("TAG", "timeDataInt = ${timeDataInt}")
-
-                //　データベースに記述
-                val sqlUpdate = "UPDATE TimeSumLog SET TimeSumTime = ? WHERE TimeSumDate = ?"
-                stmt = db.compileStatement(sqlUpdate)
-                //　変数のバインド
-                stmt.bindString(1, timeDataInt.toString())
-                stmt.bindString(2, date)
-                stmt.execute()
-
-
-            }
+//            val sql = "SELECT * FROM TimeSumLog WHERE TimeSumDate = ?"
+//            val selectionArgs = arrayOf(date)
+//            val cursor = db.rawQuery(sql, selectionArgs)
+//
+//            while(cursor.moveToNext()) {
+//                val timeIdxNote = cursor.getColumnIndex("TimeSumTime")
+//                val timeData = cursor.getString(timeIdxNote)
+//                var timeDataInt = timeData.toInt()
+//                val timeDeference = getTimeDeference(getOutHour, getOutMin, hour, min)
+//                val timeDeferenceInt = timeDeference.toInt()
+//
+//                // 外出時間を加算
+//                Log.i("TAG", "timeDataInt = $timeDataInt, timeDeferenceInt = $timeDeferenceInt")
+//                timeDataInt += timeDeferenceInt
+//                Log.i("TAG", "timeDataInt = ${timeDataInt}")
+//
+//                //　DBを加算したデータで書き換える
+//                val sqlUpdate = "UPDATE TimeSumLog SET TimeSumTime = ? WHERE TimeSumDate = ?"
+//                stmt = db.compileStatement(sqlUpdate)
+//                //　変数のバインド
+//                stmt.bindString(1, timeDataInt.toString())
+//                stmt.bindString(2, date)
+//                stmt.execute()
+//            }
         }
         db.close()
     }
@@ -294,7 +268,38 @@ class MainActivity : AppCompatActivity() {
         //　返り値の単位は分
         return timeDeference.toString()
     }
-    // 分を時間と分に変換する関数
+
+    // dateの外出時間にtimeを加算する
+    fun addTime(date: String, time: String){
+        val db = _helper.writableDatabase
+
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            val timeData = cursor.getString(timeIdxNote)
+            var timeDataInt = timeData.toInt()
+            val timeInt = time.toInt()
+            // 外出時間を加算
+            Log.i("TAG", "timeDataInt = $timeDataInt, timeDeferenceInt = $timeInt")
+            timeDataInt += timeInt
+            Log.i("TAG", "timeDataInt = ${timeDataInt}")
+
+            //　DBを加算したデータで書き換える
+            val sqlUpdate = "UPDATE TimeSumLog SET Time = ? WHERE Date = ?"
+            var stmt = db.compileStatement(sqlUpdate)
+            //　変数のバインド
+            stmt.bindString(1, timeDataInt.toString())
+            stmt.bindString(2, date)
+            stmt.execute()
+        }
+    }
+
+    // ex)　入力：97　→　出力：1時間37分
     fun minToHour(min: String): String {
         // StringをIntに変換
         val minInt = min.toInt()
@@ -303,14 +308,15 @@ class MainActivity : AppCompatActivity() {
         val output = "${outputHour}時間${outputMin}分"
         return output
     }
+
     // 外出帰宅時間からその日の総外出時間をDBに格納。外出、帰宅DBの要素数がそろっているときに実行してね♪
     // 日付またぎ未実装
     fun makeTimeLogs(){
 
         val db = _helper.writableDatabase
 
-        val outSql = "SELECT * FROM GetOutTimeLogs"
-        val homeSql = "SELECT * FROM GetHomeTimeLogs"
+        val outSql = "SELECT * FROM GetOutTimeLog"
+        val homeSql = "SELECT * FROM GetHomeTimeLog"
         val outCursor = db.rawQuery(outSql,null)
         val homeCursor = db.rawQuery(homeSql,null)
 
@@ -361,15 +367,15 @@ class MainActivity : AppCompatActivity() {
             val db = _helper.writableDatabase
 
             // TimeSumLogからデータを所得
-            val sql = "SELECT * FROM TimeSumLog WHERE TimeSumDate = ?"
+            val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
             val selectionArgs = arrayOf(selectedDate)
             val cursor = db.rawQuery(sql, selectionArgs)
 
             while(cursor.moveToNext()) {
-                var timeIdxNote = cursor.getColumnIndex("TimeSumDate")
+                var timeIdxNote = cursor.getColumnIndex("Date")
                 var timeData = cursor.getString(timeIdxNote)
                 Log.i("TAG", "$timeData")
-                timeIdxNote = cursor.getColumnIndex("TimeSumTime")
+                timeIdxNote = cursor.getColumnIndex("Time")
                 timeData = cursor.getString(timeIdxNote)
                 Log.i("TAG", "$timeData")
                 Toast.makeText(applicationContext, "${minToHour(timeData)}", Toast.LENGTH_LONG).show()
