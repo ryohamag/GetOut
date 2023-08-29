@@ -7,7 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.ListView
@@ -26,16 +26,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         val calendarListView = findViewById<ListView>(R.id.calendarListView)
-        val calendar = Calendar.getInstance()
-        val currentYear = calendar.get(Calendar.YEAR)
-        val currentMonth = calendar.get(Calendar.MONTH)
 
+        val startDate = "2023-01-01" // 開始日
+        val endDate = "2023-12-31" // 終了日
 
-        val allMonths = generateAllMonths()
-        val adapter = CalendarAdapter(this, allMonths[currentMonth]) // currentMonth には表示したい月の番号を入れる
+        val dates = generateDatesInRange(startDate, endDate)
+        val adapter = CalendarAdapter(this, dates)
         calendarListView.adapter = adapter
-
 
 
 
@@ -415,19 +414,63 @@ class MainActivity : AppCompatActivity() {
 
 
 }
-class CalendarAdapter(context: Context, private val dates: List<String>) : ArrayAdapter<String>(context, 0, dates) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
+    val datesWithStatus = mutableListOf<DateStatus>()
+    val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+
+    val calendarStart = Calendar.getInstance()
+    calendarStart.time = dateFormat.parse(startDate)
+
+    val calendarEnd = Calendar.getInstance()
+    calendarEnd.time = dateFormat.parse(endDate)
+
+    val currentDate = calendarStart.clone() as Calendar
+
+    while (currentDate <= calendarEnd) {
+        val date = dateFormat.format(currentDate.time)
+        val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+                (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+        val status = isWeekend
+
+
+        val dateStatus = DateStatus(date, status)
+        datesWithStatus.add(dateStatus)
+
+        currentDate.add(Calendar.DAY_OF_MONTH, 1)
+    }
+
+    return datesWithStatus
+}
+class CalendarAdapter(private val context: Context, private val datesWithStatus: List<DateStatus>) : BaseAdapter() {
+
+    override fun getCount(): Int {
+        return datesWithStatus.size
+    }
+
+    override fun getItem(position: Int): DateStatus {
+        return datesWithStatus[position]
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var convertView = convertView
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_calendar, parent, false)
         }
 
-        val date = getItem(position)
-
+        val dateStatus = getItem(position)
         val dateTextView = convertView!!.findViewById<TextView>(R.id.dateTextView)
-        dateTextView.text = date
-
+        val dateStatusTextView = convertView.findViewById<TextView>(R.id.dateStatusTextView)
+        dateTextView.text = dateStatus.date
+        dateStatusTextView.text = if (dateStatus.status) "◯" else "×"
         return convertView
     }
 }
+
+data class DateStatus(val date: String, val status: Boolean)
+
+
