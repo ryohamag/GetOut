@@ -23,12 +23,16 @@ import java.util.*
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.websarva.wings.getout.MainActivity // MainActivity.ktのパッケージ名を適切に指定
 
 class ChartWeekActivity : AppCompatActivity() {
 
     // 参照する日付を格納する変数
     var referencedDate = Calendar.getInstance()
     val dayOfWeek = referencedDate.get(Calendar.DAY_OF_WEEK)
+
+    val mainActivity = MainActivity()
+
 
     var Sun = referencedDate.toInstant()
     var Mon = Sun.plusSeconds(86400)
@@ -63,26 +67,25 @@ class ChartWeekActivity : AppCompatActivity() {
         var Sat = Sun.plusSeconds(86400*6)
 
         // X 軸ごとの Y 軸
-        val entries: MutableList<Int> = mutableListOf(
-            SunData,
-            MonData,
-            TueData,
-            WedData,
-            ThuData,
-            FriData,
-            SatData
-        )
+        val entries: MutableList<String> = mutableListOf()
+
+        val dates = listOf(Sun, Mon, Tue, Wed, Thu, Fri, Sat) // それぞれの日付
+        for (date in dates) {
+            val time = mainActivity.getTime(date.toString()) // date を文字列に変換して getTime 関数を呼び出す
+            entries.add(time)
+        }
+
 
 
         // X 軸のタイムスタンプ
         val entriesTimestampMills: MutableList<Instant> = mutableListOf(
-            Sun,  // 2021/09/03 00:00:00
-            Mon,  // 2021/09/04 00:00:00
-            Tue,  // 2021/09/05 00:00:00
-            Wed,  // 2021/09/06 00:00:00
-            Thu,  // 2021/09/07 00:00:00
-            Fri,  // 2023/09/08 00:00:00
-            Sat   // 2021/09/09 00:00:00
+            Sun,
+            Mon,
+            Tue,
+            Wed,
+            Thu,
+            Fri,
+            Sat
         )
 
         // グラフに描画するデータの設定
@@ -156,8 +159,6 @@ class ChartWeekActivity : AppCompatActivity() {
 
     private fun getLast7DaysLabels(referencedDate: Calendar): List<String> {
         val labels = ArrayList<String>()
-//        var referencedDate = Calendar.getInstance()
-//        referencedDate.add(Calendar.DAY_OF_YEAR, getDayOfWeekAsString(dayOfWeek))
         referencedDate.add(Calendar.DAY_OF_YEAR, -8)
 
         for (i in 0 .. 6) {
@@ -171,8 +172,6 @@ class ChartWeekActivity : AppCompatActivity() {
 
     private fun getNext7DaysLabels(referencedDate: Calendar): List<String> {
         val labels = ArrayList<String>()
-//        var referencedDate = Calendar.getInstance()
-//        referencedDate.add(Calendar.DAY_OF_YEAR, getDayOfWeekAsString(dayOfWeek))
         referencedDate.add(Calendar.DAY_OF_YEAR, 6)
 
         for (i in 0 .. 6) {
@@ -197,6 +196,7 @@ class ChartWeekActivity : AppCompatActivity() {
             else -> -7
         }
     }
+
 
     private inner class ToWeekListener(private val activity: ChartWeekActivity): View.OnClickListener {
         override fun onClick(view: View){
@@ -231,7 +231,6 @@ class ChartWeekActivity : AppCompatActivity() {
 
                     Log.i("TAG", "${referencedDate.time}")
                     barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getLast7DaysLabels(referencedDate))
-//                    referencedDate.add(Calendar.DAY_OF_YEAR, -1)
 
                     // データが変更されたことを通知
                     barChart.data.notifyDataChanged()
@@ -241,14 +240,6 @@ class ChartWeekActivity : AppCompatActivity() {
                     barChart.invalidate()
                 }
                 R.id.btToNextWeek -> {
-                    // 新しい日付を計算
-                    activity.Sun = activity.Sun.plusSeconds(86400 * 7)
-                    activity.Mon = activity.Mon.plusSeconds(86400 * 7)
-                    activity.Tue = activity.Tue.plusSeconds(86400 * 7)
-                    activity.Wed = activity.Wed.plusSeconds(86400 * 7)
-                    activity.Thu = activity.Thu.plusSeconds(86400 * 7)
-                    activity.Fri = activity.Fri.plusSeconds(86400 * 7)
-                    activity.Sat = activity.Sat.plusSeconds(86400 * 7)
                     // 新しいデータを作成
                     val newEntries: MutableList<Int> = mutableListOf(
                         activity.SunData,
@@ -274,9 +265,6 @@ class ChartWeekActivity : AppCompatActivity() {
 
                     // 新しいデータを設定
                     barChart.data = newBarData
-
-                    Log.i("TAG", "${referencedDate.time}")
-//                    referencedDate.add(Calendar.DAY_OF_YEAR, 7)
                     barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getNext7DaysLabels(referencedDate))
 
                     // データが変更されたことを通知
