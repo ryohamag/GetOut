@@ -179,6 +179,8 @@ class MainActivity : AppCompatActivity() {
     }
     // 帰宅ボタンを押したときの処理
     fun onGetHomeButtonClick(view:View){
+        val hoge = getTime("2023-8-21")
+        Log.i("TAG", "$hoge")
         val db = _helper.writableDatabase
 
         // 外出時刻を所得
@@ -320,6 +322,7 @@ class MainActivity : AppCompatActivity() {
             val timeIdxNote = cursor.getColumnIndex("Time")
             timeData = cursor.getString(timeIdxNote)
         }
+        db.close()
         return timeData
     }
 

@@ -24,6 +24,8 @@ import java.util.Date
 import java.util.Locale
 
 class ChartWeekActivity : AppCompatActivity() {
+    //データベースヘルパーオブジェクトを作成
+    private val _helper = DatabaseHelper(this@ChartWeekActivity)
 
     // 参照する日付を格納する変数
     var referencedDate = Calendar.getInstance()
@@ -143,6 +145,8 @@ class ChartWeekActivity : AppCompatActivity() {
     private val dateFormatter = SimpleDateFormat("M/d", Locale.getDefault())
 
     private fun getLast7DaysLabels(referencedDate: Calendar): List<String> {
+        val hoge =getTime("2023-3-23")
+        Log.i("TAG", "$hoge")
         val labels = ArrayList<String>()
         val calendar = referencedDate
         calendar.add(Calendar.DAY_OF_YEAR, -8)
@@ -157,6 +161,8 @@ class ChartWeekActivity : AppCompatActivity() {
     }
 
     private fun getNext7DaysLabels(referencedDate: Calendar): List<String> {
+        val hoge = getTime("2023-3-2")
+        Log.i("TAG", "$hoge")
         val labels = ArrayList<String>()
 //        val calendar = Calendar.getInstance()
         var calendar = referencedDate
@@ -261,6 +267,24 @@ class ChartWeekActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    // YYYY-M-d形式の日付から総外出時間を所得する
+    fun getTime(date: String): String{
+        val db = _helper.writableDatabase
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        var timeData = ""
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        db.close()
+        return timeData
     }
 
 
