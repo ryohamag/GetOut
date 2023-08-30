@@ -13,5 +13,5 @@
     <string name="tv_hour">時間</string>
     <string name="tv_minute">分</string>
     <string name="bt_toLastWeek">先週へ</string>
-    <string name="bt_toNextWeek">来週へ</string>
+    <string name="bt_toNextWeek">翌週へ</string>
 </resources>
