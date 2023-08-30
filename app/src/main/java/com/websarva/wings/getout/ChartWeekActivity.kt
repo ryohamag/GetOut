@@ -17,6 +17,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
 import java.time.Instant
 import java.util.*
 import java.util.Calendar
@@ -27,14 +28,15 @@ class ChartWeekActivity : AppCompatActivity() {
 
     // 参照する日付を格納する変数
     var referencedDate = Calendar.getInstance()
+    val dayOfWeek = referencedDate.get(Calendar.DAY_OF_WEEK)
 
-    var Sun: Instant = Instant.now()
-    var Mon: Instant = Sun.plusSeconds(86400)
-    var Tue: Instant = Sun.plusSeconds(86400*2)
-    var Wed: Instant = Sun.plusSeconds(86400*3)
-    var Thu: Instant = Sun.plusSeconds(86400*4)
-    var Fri: Instant = Sun.plusSeconds(86400*5)
-    var Sat: Instant = Sun.plusSeconds(86400*6)
+    var Sun = referencedDate.toInstant()
+    var Mon = Sun.plusSeconds(86400)
+    var Tue = Sun.plusSeconds(86400*2)
+    var Wed = Sun.plusSeconds(86400*3)
+    var Thu = Sun.plusSeconds(86400*4)
+    var Fri = Sun.plusSeconds(86400*5)
+    var Sat = Sun.plusSeconds(86400*6)
 
     var SunData = 105
     var MonData = 129
@@ -49,6 +51,16 @@ class ChartWeekActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chart_week)
 
         val barChart: BarChart = findViewById(R.id.barChart)
+
+        referencedDate.add(Calendar.DAY_OF_YEAR, getDayOfWeekAsString(dayOfWeek))
+
+        var Sun = referencedDate.toInstant()
+        var Mon = Sun.plusSeconds(86400)
+        var Tue = Sun.plusSeconds(86400*2)
+        var Wed = Sun.plusSeconds(86400*3)
+        var Thu = Sun.plusSeconds(86400*4)
+        var Fri = Sun.plusSeconds(86400*5)
+        var Sat = Sun.plusSeconds(86400*6)
 
         // X 軸ごとの Y 軸
         val entries: MutableList<Int> = mutableListOf(
@@ -144,31 +156,46 @@ class ChartWeekActivity : AppCompatActivity() {
 
     private fun getLast7DaysLabels(referencedDate: Calendar): List<String> {
         val labels = ArrayList<String>()
-        val calendar = referencedDate
-        calendar.add(Calendar.DAY_OF_YEAR, -8)
+//        var referencedDate = Calendar.getInstance()
+//        referencedDate.add(Calendar.DAY_OF_YEAR, getDayOfWeekAsString(dayOfWeek))
+        referencedDate.add(Calendar.DAY_OF_YEAR, -8)
 
         for (i in 0 .. 6) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
-            labels.add(dateFormatter.format(calendar.time))
+            referencedDate.add(Calendar.DAY_OF_YEAR, 1)
+            labels.add(dateFormatter.format(referencedDate.time))
         }
-        calendar.add(Calendar.DAY_OF_YEAR, -6)
+        referencedDate.add(Calendar.DAY_OF_YEAR, -6)
 
         return labels
     }
 
     private fun getNext7DaysLabels(referencedDate: Calendar): List<String> {
         val labels = ArrayList<String>()
-//        val calendar = Calendar.getInstance()
-        var calendar = referencedDate
-        calendar.add(Calendar.DAY_OF_YEAR, 6)
+//        var referencedDate = Calendar.getInstance()
+//        referencedDate.add(Calendar.DAY_OF_YEAR, getDayOfWeekAsString(dayOfWeek))
+        referencedDate.add(Calendar.DAY_OF_YEAR, 6)
 
         for (i in 0 .. 6) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
-            labels.add(dateFormatter.format(calendar.time))
+            referencedDate.add(Calendar.DAY_OF_YEAR, 1)
+
+            labels.add(dateFormatter.format(referencedDate.time))
         }
-        calendar.add(Calendar.DAY_OF_YEAR, -6)
+        referencedDate.add(Calendar.DAY_OF_YEAR, -6)
 
         return labels
+    }
+
+    private fun getDayOfWeekAsString(dayOfWeek: Int): Int {
+        return when (dayOfWeek) {
+            Calendar.SUNDAY -> 0
+            Calendar.MONDAY -> -1
+            Calendar.TUESDAY -> -2
+            Calendar.WEDNESDAY -> -3
+            Calendar.THURSDAY -> -4
+            Calendar.FRIDAY -> -5
+            Calendar.SATURDAY -> -6
+            else -> -7
+        }
     }
 
     private inner class ToWeekListener(private val activity: ChartWeekActivity): View.OnClickListener {
