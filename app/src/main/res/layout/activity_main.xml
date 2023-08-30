@@ -130,15 +130,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
+        <!-- ListViewを配置します。 -->
+        <ListView
+            android:id="@+id/calendarListView"
+            android:layout_width="match_parent"
+            android:layout_height="322dp" />
+      
         <!-- CalendarViewを配置します。 -->
 <!--        <CalendarView-->
 <!--            android:id="@+id/calendarView"-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content" />-->
-        <CalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="match_parent"
-            android:layout_height="444dp" />
+<!--         <CalendarView -->
+<!--             android:id="@+id/calendarView" -->
+<!--             android:layout_width="match_parent" -->
+<!--             android:layout_height="444dp" /> -->
 
         <!-- 設定ボタンを配置します。 -->
 

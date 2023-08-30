@@ -1,23 +1,25 @@
 package com.websarva.wings.getout
 
+import android.content.Context
 import android.content.ContentValues
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.Button
 import android.util.Log
-import android.widget.TextView
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.util.Date
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.Button
 import android.widget.CalendarView
+import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,13 +30,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        // CalendarViewに現在日時を設定します。
-//        val calendarView = findViewById<CalendarView>(R.id.calendarView)
-//        calendarView.date = System.currentTimeMillis()
-//
-//        // CalendarViewで日にちが選択された時に呼び出されるリスナー
-//        val listener = DateChangeListener()
-//        calendarView.setOnDateChangeListener(listener)
+        val calendarListView = findViewById<ListView>(R.id.calendarListView)
+
+        val startDate = "2023-01-01" // 開始日
+        val endDate = "2023-12-31" // 終了日
+
+        val dates = generateDatesInRange(startDate, endDate)
+        val adapter = CalendarAdapter(this, dates)
+
+        calendarListView.adapter = adapter
 
         val btNotification = findViewById<Button>(R.id.btNotification)
         //ボタンクリックのリスナーを設定。
@@ -127,19 +131,19 @@ class MainActivity : AppCompatActivity() {
     fun onGetOutButtonClick(view: View){ // 外出ボタンを押したときの処理
         val db = _helper.writableDatabase
 
-        // GetOutTimeLogsからデータを所得
+
         val sql = "SELECT * FROM GetOutTimeLog "
         val cursor = db.rawQuery(sql, null)
 
         while(cursor.moveToNext()) {
             val dateIdxNote = cursor.getColumnIndex("getOutDate")
-//            val hourIdxNote = cursor.getColumnIndex("getOutHour")
-//            val minIdxNote = cursor.getColumnIndex("getOutMin")
+            val hourIdxNote = cursor.getColumnIndex("getOutHour")
+            val minIdxNote = cursor.getColumnIndex("getOutMin")
             val getOutDate = cursor.getString(dateIdxNote)
-//            val getOutHour = cursor.getString(hourIdxNote)
-//            val getOutMin = cursor.getString(minIdxNote)
+            val getOutHour = cursor.getString(hourIdxNote)
+            val getOutMin = cursor.getString(minIdxNote)
 
-//            Log.i("TAG", "${getOutDate},${getOutHour},${getOutMin}")
+            Log.i("TAG", "${getOutDate},${getOutHour},${getOutMin}")
 
             // DBに日付データが格納されていたら
             if(getOutDate != null){
@@ -152,6 +156,7 @@ class MainActivity : AppCompatActivity() {
             val sqlDelete = "DELETE FROM GetOutTimeLog"
             var stmt = db.compileStatement(sqlDelete)
             stmt.executeUpdateDelete()
+
 
             // 現在日時を所得
             val dfDate = SimpleDateFormat("yyyy-M-d")
@@ -301,6 +306,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // YYYY-M-d形式の日付から総外出時間を所得する
+    fun getTime(date: String): String{
+        val db = _helper.writableDatabase
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        var timeData = ""
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        return timeData
+    }
+
     // ex)　入力：97　→　出力：1時間37分
     fun minToHour(min: String): String {
         // StringをIntに変換
@@ -388,3 +410,63 @@ class MainActivity : AppCompatActivity() {
 
 
 }
+
+private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
+    val datesWithStatus = mutableListOf<DateStatus>()
+    val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+
+    val calendarStart = Calendar.getInstance()
+    calendarStart.time = dateFormat.parse(startDate)
+
+    val calendarEnd = Calendar.getInstance()
+    calendarEnd.time = dateFormat.parse(endDate)
+
+    val currentDate = calendarStart.clone() as Calendar
+
+    while (currentDate <= calendarEnd) {
+        val date = dateFormat.format(currentDate.time)
+        val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+                (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+        val status = isWeekend
+
+
+        val dateStatus = DateStatus(date, status)
+        datesWithStatus.add(dateStatus)
+
+        currentDate.add(Calendar.DAY_OF_MONTH, 1)
+    }
+
+    return datesWithStatus
+}
+class CalendarAdapter(private val context: Context, private val datesWithStatus: List<DateStatus>) : BaseAdapter() {
+
+    override fun getCount(): Int {
+        return datesWithStatus.size
+    }
+
+    override fun getItem(position: Int): DateStatus {
+        return datesWithStatus[position]
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        var convertView = convertView
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.list_item_calendar, parent, false)
+        }
+
+        val dateStatus = getItem(position)
+        val dateTextView = convertView!!.findViewById<TextView>(R.id.dateTextView)
+        val dateStatusTextView = convertView.findViewById<TextView>(R.id.dateStatusTextView)
+        dateTextView.text = dateStatus.date
+        dateStatusTextView.text = if (dateStatus.status) "◯" else "×"
+        return convertView
+    }
+}
+
+data class DateStatus(val date: String, val status: Boolean)
+
+
