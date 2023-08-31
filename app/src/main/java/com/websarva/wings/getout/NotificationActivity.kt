@@ -1,5 +1,6 @@
 package com.websarva.wings.getout
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,7 +9,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import kotlin.math.log
 
 class NotificationActivity : AppCompatActivity() {
     //データベースヘルパーオブジェクトを作成
@@ -36,18 +36,25 @@ class NotificationActivity : AppCompatActivity() {
     private fun addNumbers() {
         val hoursText = numberInput1.text.toString()
         val minutesText = numberInput2.text.toString()
+        val hours = hoursText.toInt()
+        val minutes = minutesText.toInt()
+        val result = 60 * hours + minutes
+
 
         if (hoursText.isNotEmpty() && minutesText.isNotEmpty()) {
-            val hours = hoursText.toInt()
-            val minutes = minutesText.toInt()
+
 
             // Calculate something or perform an action here
 
-            val result = "Calculated result: ${hours + minutes}"
+
 
             // Display a Toast message with the calculated result
             Toast.makeText(this, "目標時間が設定されました", Toast.LENGTH_SHORT).show()
         }
+        // MainActivity に計算結果を伝える
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("result", result) // 計算結果を追加
+        startActivity(intent)
     }
 
     fun addNumbers(view: View) {
