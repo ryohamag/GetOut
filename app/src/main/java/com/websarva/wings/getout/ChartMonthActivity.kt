@@ -2,6 +2,7 @@ package com.websarva.wings.getout
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
@@ -15,7 +16,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ChartMonthActivity : AppCompatActivity() {
+    //データベースヘルパーオブジェクトを作成
+    private val _helper = DatabaseHelper(this@ChartMonthActivity)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val hoge = getTime("2023-3-2")
+        Log.i("TAG", "$hoge")
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chart_month)
 
@@ -110,6 +116,24 @@ class ChartMonthActivity : AppCompatActivity() {
         // グラフ描画
         barChart.invalidate()
 
+    }
+
+    // YYYY-M-d形式の日付から総外出時間を所得する
+    fun getTime(date: String): String{
+        val db = _helper.writableDatabase
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        var timeData = ""
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        db.close()
+        return timeData
     }
 }
 

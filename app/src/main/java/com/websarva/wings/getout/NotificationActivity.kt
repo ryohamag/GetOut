@@ -1,19 +1,25 @@
 package com.websarva.wings.getout
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.math.log
 
 class NotificationActivity : AppCompatActivity() {
+    //データベースヘルパーオブジェクトを作成
+    private val _helper = DatabaseHelper(this@NotificationActivity)
     private lateinit var numberInput1: EditText
     private lateinit var numberInput2: EditText
     private lateinit var resultText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val hoge=getTime("2023-3-8")
+        Log.i("TAG", "$hoge")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification)
 
@@ -50,5 +56,23 @@ class NotificationActivity : AppCompatActivity() {
 
         val sum = 60*num1 + num2
         resultText.text = "Result: $sum"
+    }
+
+    // YYYY-M-d形式の日付から総外出時間を所得する
+    fun getTime(date: String): String{
+        val db = _helper.writableDatabase
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        var timeData = ""
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        db.close()
+        return timeData
     }
 }
