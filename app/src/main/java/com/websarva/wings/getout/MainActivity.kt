@@ -1,8 +1,7 @@
 package com.websarva.wings.getout
 
-import android.content.Context
-import android.content.ContentValues
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +19,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+
+
+data class DateStatus(val date: String, val status: Boolean, val time: String)
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -310,6 +313,7 @@ class MainActivity : AppCompatActivity() {
 
     // YYYY-M-d形式の日付から総外出時間を所得する
     fun getTime(date: String): String{
+        val datesWithStatus = mutableListOf<DateStatus>()
         val db = _helper.writableDatabase
 
         // TimeSumLogからデータを所得
@@ -323,6 +327,11 @@ class MainActivity : AppCompatActivity() {
             timeData = cursor.getString(timeIdxNote)
         }
         db.close()
+        // 外出時間と表示用のステータスを取得してリストに追加
+        val isWeekend = false // ここでは週末の判定を行わないため false としています
+        val dateStatus = DateStatus(date, isWeekend, minToHour(timeData))
+        datesWithStatus.add(dateStatus)
+
         return timeData
     }
 
@@ -410,37 +419,41 @@ class MainActivity : AppCompatActivity() {
             db.close()
         }
     }
+    private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
 
 
-}
+        val datesWithStatus = mutableListOf<DateStatus>()
+        val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
 
-private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
-    val datesWithStatus = mutableListOf<DateStatus>()
-    val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+        val calendarStart = Calendar.getInstance()
+        calendarStart.time = dateFormat.parse(startDate)
 
-    val calendarStart = Calendar.getInstance()
-    calendarStart.time = dateFormat.parse(startDate)
+        val calendarEnd = Calendar.getInstance()
+        calendarEnd.time = dateFormat.parse(endDate)
 
-    val calendarEnd = Calendar.getInstance()
-    calendarEnd.time = dateFormat.parse(endDate)
+        val currentDate = calendarStart.clone() as Calendar
 
-    val currentDate = calendarStart.clone() as Calendar
-
-    while (currentDate <= calendarEnd) {
-        val date = dateFormat.format(currentDate.time)
-        val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
-                (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-        val status = isWeekend
+        while (currentDate <= calendarEnd) {
+            val date = dateFormat.format(currentDate.time)
+            val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+                    (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+            val status = isWeekend
 
 
-        val dateStatus = DateStatus(date, status)
-        datesWithStatus.add(dateStatus)
 
-        currentDate.add(Calendar.DAY_OF_MONTH, 1)
+            val dateStatus = DateStatus(date, status, getTime(date)) // 'time' の値を渡す
+            datesWithStatus.add(dateStatus)
+
+            currentDate.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return datesWithStatus
     }
 
-    return datesWithStatus
+
 }
+
+
 class CalendarAdapter(private val context: Context, private val datesWithStatus: List<DateStatus>) : BaseAdapter() {
 
     override fun getCount(): Int {
@@ -464,12 +477,15 @@ class CalendarAdapter(private val context: Context, private val datesWithStatus:
         val dateStatus = getItem(position)
         val dateTextView = convertView!!.findViewById<TextView>(R.id.dateTextView)
         val dateStatusTextView = convertView.findViewById<TextView>(R.id.dateStatusTextView)
+        val timeTextView = convertView.findViewById<TextView>(R.id.timeTextView) // 追加
+
         dateTextView.text = dateStatus.date
         dateStatusTextView.text = if (dateStatus.status) "◯" else "×"
+        timeTextView.text = dateStatus.time // 追加
+
         return convertView
     }
 }
 
-data class DateStatus(val date: String, val status: Boolean)
 
 
