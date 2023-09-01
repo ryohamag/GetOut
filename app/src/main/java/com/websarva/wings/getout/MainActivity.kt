@@ -76,6 +76,14 @@ class MainActivity : AppCompatActivity() {
 
     fun onReloadButtonClick(view: View){ // サーバー内のデータを確認する
 
+        for (i in 1..12){
+            for (j in 1 .. 25){
+                val ho = "2023-$i-$j"
+                val hoge = getTime(ho)
+                Log.i("test", "$hoge")
+            }
+        }
+
         val db = _helper.writableDatabase
 
         // 外出の方
