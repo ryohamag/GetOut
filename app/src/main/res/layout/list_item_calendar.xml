@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="70dp"
     android:orientation="horizontal"
     android:padding="8dp">
 
     <TextView
         android:id="@+id/dateTextView"
-        android:layout_width="219dp"
-        android:layout_height="66dp"
+        android:layout_width="148dp"
+        android:layout_height="52dp"
         android:textAlignment="center"
-        android:textSize="18sp" />
+        android:textSize="34sp" />
 
     <TextView
         android:id="@+id/dateStatusTextView"
-        android:layout_width="66dp"
-        android:layout_height="wrap_content"
+        android:layout_width="62dp"
+        android:layout_height="76dp"
         android:layout_gravity="center"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:textSize="18sp" />
+        android:textSize="48sp" />
 
     <TextView
         android:id="@+id/timeTextView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:textSize="34sp" />
 
 </LinearLayout>
