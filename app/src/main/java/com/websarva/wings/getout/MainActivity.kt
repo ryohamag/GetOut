@@ -420,8 +420,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
-
-
         val datesWithStatus = mutableListOf<DateStatus>()
         val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
 
@@ -439,15 +437,35 @@ class MainActivity : AppCompatActivity() {
                     (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
             val status = isWeekend
 
+            // ここで外出時間を計算し、分から時間に変換
+            val timeData = calculateTime(date)
+            val timeInHours = minToHour(timeData)
 
-
-            val dateStatus = DateStatus(date, status, getTime(date)) // 'time' の値を渡す
+            val dateStatus = DateStatus(date, status, timeInHours)
             datesWithStatus.add(dateStatus)
 
             currentDate.add(Calendar.DAY_OF_MONTH, 1)
         }
 
         return datesWithStatus
+    }
+
+    // 日付から外出時間を計算する関数を再実装
+    private fun calculateTime(date: String): String {
+        val db = _helper.writableDatabase
+
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        var timeData = ""
+        while (cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        db.close()
+
+        return timeData
     }
 
 
