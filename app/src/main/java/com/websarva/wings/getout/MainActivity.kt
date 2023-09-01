@@ -30,6 +30,14 @@ class MainActivity : AppCompatActivity() {
 
     //データベースヘルパーオブジェクトを作成
     private val _helper = DatabaseHelper(this@MainActivity)
+
+//    val startDate = "2023-01-01" // 開始日
+//    val endDate = "2023-12-31" // 終了日
+    // 現在日時を所得
+    val dfDate = SimpleDateFormat("yyyy-M-d")
+    val date = dfDate.format(Date())
+    val endDate = "2023-01-01" // 開始日
+    val startDate = date // 終了日
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +45,6 @@ class MainActivity : AppCompatActivity() {
 
         val calendarListView = findViewById<ListView>(R.id.calendarListView)
 
-        val startDate = "2023-01-01" // 開始日
-        val endDate = "2023-12-31" // 終了日
 
         val dates = generateDatesInRange(startDate, endDate)
         val adapter = CalendarAdapter(this, dates)
@@ -235,9 +241,10 @@ class MainActivity : AppCompatActivity() {
             output.text = getHomeHour.toString() + getHomeMin.toString()
 
 //            Log.i("addtime", "$getOutDate,$getHomeDate")
-            addDateTime(getOutDate,getOutHour,getOutMin,"2023-9-4",getHomeHour,getHomeMin)
+            addDateTime(getOutDate,getOutHour,getOutMin,getHomeDate,getHomeHour,getHomeMin)
 
 
+            generateDatesInRange(startDate, endDate)
 //            // TimeSumLogからデータを所得
 //            val sql = "SELECT * FROM TimeSumLog WHERE TimeSumDate = ?"
 //            val selectionArgs = arrayOf(date)
@@ -460,7 +467,7 @@ class MainActivity : AppCompatActivity() {
 
         val currentDate = calendarStart.clone() as Calendar
 
-        while (currentDate <= calendarEnd) {
+        while (currentDate >= calendarEnd) {
             val date = dateFormat.format(currentDate.time)
             val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
                     (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
@@ -473,7 +480,7 @@ class MainActivity : AppCompatActivity() {
             val dateStatus = DateStatus(date, status, timeInHours)
             datesWithStatus.add(dateStatus)
 
-            currentDate.add(Calendar.DAY_OF_MONTH, 1)
+            currentDate.add(Calendar.DAY_OF_MONTH, -1)
         }
 
         return datesWithStatus
