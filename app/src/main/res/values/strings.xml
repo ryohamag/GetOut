@@ -14,4 +14,5 @@
     <string name="tv_minute">分</string>
     <string name="bt_toLastWeek">先週へ</string>
     <string name="bt_toNextWeek">翌週へ</string>
+    <string name="tv_memList">記録リスト</string>
 </resources>

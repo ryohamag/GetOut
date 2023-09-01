@@ -30,6 +30,7 @@ class NotificationActivity : AppCompatActivity() {
         val button: Button = findViewById(R.id.completionbutton)
         button.setOnClickListener {
             addNumbers()
+
         }
     }
 

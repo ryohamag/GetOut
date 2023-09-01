@@ -79,6 +79,14 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
             //　日にちを一日進める
             currentDate = currentDate.plusDays(1)
         }
+
+        //　目標外出時間を記録するデータベースを作成
+        val goalTimeLog = StringBuilder()
+        goalTimeLog.append("CREATE TABLE GoalTimeLog(")
+        goalTimeLog.append("GoalTimeMin TEXT")
+        goalTimeLog.append(");")
+        val sqlgtl = goalTimeLog.toString()
+        db.execSQL(sqlgtl)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
