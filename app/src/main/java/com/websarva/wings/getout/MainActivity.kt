@@ -17,6 +17,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -76,14 +78,6 @@ class MainActivity : AppCompatActivity() {
 
     fun onReloadButtonClick(view: View){ // サーバー内のデータを確認する
 
-        for (i in 1..12){
-            for (j in 1 .. 25){
-                val ho = "2023-$i-$j"
-                val hoge = getTime(ho)
-                Log.i("test", "$hoge")
-            }
-        }
-
         val db = _helper.writableDatabase
 
         // 外出の方
@@ -97,7 +91,7 @@ class MainActivity : AppCompatActivity() {
             log += cursor.getString(idxNote)
             log += " "
         }
-        Log.i("count", "GetOut=" + log)
+//        Log.i("count", "GetOut=" + log)
         // tvGetOutTimeにlogのテキストを設定
         val GetOutOutput = findViewById<TextView>(R.id.tvGetOutTime)
         GetOutOutput.text = log
@@ -108,10 +102,10 @@ class MainActivity : AppCompatActivity() {
         while (cursor.moveToNext()) {
             var dataColumnIndex = cursor.getColumnIndex("Date")
             var data = cursor.getString(dataColumnIndex)
-            Log.i("DatabaseData", "Data: $data")
+//            Log.i("DatabaseData", "Data: $data")
             dataColumnIndex = cursor.getColumnIndex("Time")
             data = cursor.getString(dataColumnIndex)
-            Log.i("DatabaseData", "Data: $data")
+//            Log.i("DatabaseData", "Data: $data")
         }
 
 //        // 帰宅の方
@@ -151,11 +145,11 @@ class MainActivity : AppCompatActivity() {
             val getOutHour = cursor.getString(hourIdxNote)
             val getOutMin = cursor.getString(minIdxNote)
 
-            Log.i("TAG", "${getOutDate},${getOutHour},${getOutMin}")
+//            Log.i("TAG", "${getOutDate},${getOutHour},${getOutMin}")
 
             // DBに日付データが格納されていたら
             if(getOutDate != null){
-                Log.i("TAG", "nullCheck")
+//                Log.i("TAG", "nullCheck")
                 // 関数を終了する
                 db.close()
                 return
@@ -188,7 +182,7 @@ class MainActivity : AppCompatActivity() {
     // 帰宅ボタンを押したときの処理
     fun onGetHomeButtonClick(view:View){
         val hoge = getTime("2023-8-21")
-        Log.i("TAG", "$hoge")
+//        Log.i("TAG", "$hoge")
         val db = _helper.writableDatabase
 
         // 外出時刻を所得
@@ -205,11 +199,11 @@ class MainActivity : AppCompatActivity() {
             val getOutHour = cursor.getString(hourIdxNote)
             val getOutMin = cursor.getString(minIdxNote)
 
-            Log.i("getHome", "${getOutDate},${getOutHour},${getOutMin}")
+//            Log.i("getHome", "${getOutDate},${getOutHour},${getOutMin}")
 
             // 外出時刻のデータが格納されていなければ（nullか否かで判定します。）
             if (getOutDate == null) {
-                Log.i("TAG", "nullCheck")
+//                Log.i("TAG", "nullCheck")
                 // 関数を終了する
                 db.close()
                 return
@@ -237,8 +231,9 @@ class MainActivity : AppCompatActivity() {
             val output = findViewById<TextView>(R.id.tvGetHomeTime)
             output.text = getHomeHour.toString() + getHomeMin.toString()
 
-            // 今日の日付に外出時間を加算
-            addTime(getHomeDate, getTimeDeference(getOutHour, getOutMin, getHomeHour, getHomeMin))
+//            Log.i("addtime", "$getOutDate,$getHomeDate")
+            addDateTime(getOutDate,getOutHour,getOutMin,"2023-9-4",getHomeHour,getHomeMin)
+
 
 //            // TimeSumLogからデータを所得
 //            val sql = "SELECT * FROM TimeSumLog WHERE TimeSumDate = ?"
@@ -302,9 +297,9 @@ class MainActivity : AppCompatActivity() {
             var timeDataInt = timeData.toInt()
             val timeInt = time.toInt()
             // 外出時間を加算
-            Log.i("TAG", "timeDataInt = $timeDataInt, timeDeferenceInt = $timeInt")
+//            Log.i("TAG", "timeDataInt = $timeDataInt, timeDeferenceInt = $timeInt")
             timeDataInt += timeInt
-            Log.i("TAG", "timeDataInt = ${timeDataInt}")
+//            Log.i("TAG", "timeDataInt = ${timeDataInt}")
 
             //　DBを加算したデータで書き換える
             val sqlUpdate = "UPDATE TimeSumLog SET Time = ? WHERE Date = ?"
@@ -313,6 +308,32 @@ class MainActivity : AppCompatActivity() {
             stmt.bindString(1, timeDataInt.toString())
             stmt.bindString(2, date)
             stmt.execute()
+        }
+    }
+
+    fun addDateTime(startDate: String,startHour: String,startMin: String,endDate: String,endHour: String,endMin: String){
+        val TAG = "addDateTime"
+//        Log.i(TAG, "$startDate,$endDate,")
+        if (startDate == endDate){
+            Log.i(TAG, "$startDate,$endDate")
+//            if(startDate==="2023-9-1"){
+//                    Log.i(TAG, "true")}
+            // 今日の日付に外出時間を加算
+            addTime(startDate, getTimeDeference(startHour, startMin, endHour, endMin))
+        }
+        else{
+//            Log.i(TAG, "false")
+            // 日付のフォーマットを指定
+            val dfDate = DateTimeFormatter.ofPattern("yyyy-M-d")
+
+//            Log.i(TAG, "$startDate")
+            var nextDate = LocalDate.parse(startDate, dfDate)
+//            Log.i(TAG, "$nextDate")
+            nextDate = nextDate.plusDays(1)
+//            nextDate = LocalDate.parse(nextDate, dfDate)
+//            Log.i(TAG, "$nextDate")
+            addDateTime(startDate,startHour,startMin,startDate,"24","0")
+            addDateTime(nextDate.format(dfDate),"0","0",endDate,endHour,endMin)
         }
     }
 
@@ -346,49 +367,49 @@ class MainActivity : AppCompatActivity() {
 
     // 外出帰宅時間からその日の総外出時間をDBに格納。外出、帰宅DBの要素数がそろっているときに実行してね♪
     // 日付またぎ未実装
-    fun makeTimeLogs(){
-
-        val db = _helper.writableDatabase
-
-        val outSql = "SELECT * FROM GetOutTimeLog"
-        val homeSql = "SELECT * FROM GetHomeTimeLog"
-        val outCursor = db.rawQuery(outSql,null)
-        val homeCursor = db.rawQuery(homeSql,null)
-
-        val outDateLog = mutableListOf<String>()
-        val outHourLog = mutableListOf<String>()
-        val outMinLog = mutableListOf<String>()
-        val homeDateLog = mutableListOf<String>()
-        val homeHourLog = mutableListOf<String>()
-        val homeMinLog = mutableListOf<String>()
-
-        while (outCursor.moveToNext()) {
-            // getOutDateとgetOutHourとgetOutMinの添え字を所得
-            val dateIdxNote = outCursor.getColumnIndex("getOutDate")
-            val hourIdxNote = outCursor.getColumnIndex("getOutHour")
-            val minIdxNote = outCursor.getColumnIndex("getOutMin")
-            // 添え字を参考に所得したデータをlogに追加
-            outDateLog.add(outCursor.getString(dateIdxNote))
-            outHourLog.add(outCursor.getString(hourIdxNote))
-            outMinLog.add(outCursor.getString(minIdxNote))
-        }
-        while (homeCursor.moveToNext()) {
-            // getHomeDateとgetHomeHourとgetHomeMinの添え字を所得
-            val dateIdxNote = homeCursor.getColumnIndex("getHomeDate")
-            val hourIdxNote = homeCursor.getColumnIndex("getHomeHour")
-            val minIdxNote = homeCursor.getColumnIndex("getHomeMin")
-            // 添え字を参考に所得したデータをlogに追加
-            homeDateLog.add(homeCursor.getString(dateIdxNote))
-            homeHourLog.add(homeCursor.getString(hourIdxNote))
-            homeMinLog.add(homeCursor.getString(minIdxNote))
-        }
-        // 各要素にアクセスし、結果をDBに格納
-        for(i in 0..homeDateLog.size - 1){ //　添え字は0からなので-1している。
-            //　外出時刻と帰宅時刻から、外にいた時間を計算
-            val addTime = getTimeDeference(outHourLog[i], outMinLog[i], homeHourLog[i], homeMinLog[i])
-            Log.i("log", "${addTime}")
-        }
-    }
+//    fun makeTimeLogs(){
+//
+//        val db = _helper.writableDatabase
+//
+//        val outSql = "SELECT * FROM GetOutTimeLog"
+//        val homeSql = "SELECT * FROM GetHomeTimeLog"
+//        val outCursor = db.rawQuery(outSql,null)
+//        val homeCursor = db.rawQuery(homeSql,null)
+//
+//        val outDateLog = mutableListOf<String>()
+//        val outHourLog = mutableListOf<String>()
+//        val outMinLog = mutableListOf<String>()
+//        val homeDateLog = mutableListOf<String>()
+//        val homeHourLog = mutableListOf<String>()
+//        val homeMinLog = mutableListOf<String>()
+//
+//        while (outCursor.moveToNext()) {
+//            // getOutDateとgetOutHourとgetOutMinの添え字を所得
+//            val dateIdxNote = outCursor.getColumnIndex("getOutDate")
+//            val hourIdxNote = outCursor.getColumnIndex("getOutHour")
+//            val minIdxNote = outCursor.getColumnIndex("getOutMin")
+//            // 添え字を参考に所得したデータをlogに追加
+//            outDateLog.add(outCursor.getString(dateIdxNote))
+//            outHourLog.add(outCursor.getString(hourIdxNote))
+//            outMinLog.add(outCursor.getString(minIdxNote))
+//        }
+//        while (homeCursor.moveToNext()) {
+//            // getHomeDateとgetHomeHourとgetHomeMinの添え字を所得
+//            val dateIdxNote = homeCursor.getColumnIndex("getHomeDate")
+//            val hourIdxNote = homeCursor.getColumnIndex("getHomeHour")
+//            val minIdxNote = homeCursor.getColumnIndex("getHomeMin")
+//            // 添え字を参考に所得したデータをlogに追加
+//            homeDateLog.add(homeCursor.getString(dateIdxNote))
+//            homeHourLog.add(homeCursor.getString(hourIdxNote))
+//            homeMinLog.add(homeCursor.getString(minIdxNote))
+//        }
+//        // 各要素にアクセスし、結果をDBに格納
+//        for(i in 0..homeDateLog.size - 1){ //　添え字は0からなので-1している。
+//            //　外出時刻と帰宅時刻から、外にいた時間を計算
+//            val addTime = getTimeDeference(outHourLog[i], outMinLog[i], homeHourLog[i], homeMinLog[i])
+//            Log.i("log", "${addTime}")
+//        }
+//    }
     // CalendarViewで日にちが選択された時に呼び出されるリスナークラス
     private inner class DateChangeListener : CalendarView.OnDateChangeListener {
         override fun onSelectedDayChange(calendarView: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
@@ -397,7 +418,7 @@ class MainActivity : AppCompatActivity() {
             val displayMonth = month + 1
             // DBの日付検索用文字列を作成
             var selectedDate = "$year-$displayMonth-$dayOfMonth"
-            Log.i("TAG", "$selectedDate")
+//            Log.i("TAG", "$selectedDate")
 
             val db = _helper.writableDatabase
 
@@ -409,10 +430,10 @@ class MainActivity : AppCompatActivity() {
             while(cursor.moveToNext()) {
                 var timeIdxNote = cursor.getColumnIndex("Date")
                 var timeData = cursor.getString(timeIdxNote)
-                Log.i("TAG", "$timeData")
+//                Log.i("TAG", "$timeData")
                 timeIdxNote = cursor.getColumnIndex("Time")
                 timeData = cursor.getString(timeIdxNote)
-                Log.i("TAG", "$timeData")
+//                Log.i("TAG", "$timeData")
                 Toast.makeText(applicationContext, "${minToHour(timeData)}", Toast.LENGTH_LONG).show()
             }
             db.close()
