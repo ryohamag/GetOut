@@ -429,8 +429,7 @@ class MainActivity : AppCompatActivity() {
             val goalInt = getGoalTime().toInt()
             val status = timeInt >= goalInt
 
-            // ここで時間を計算し、minToHour 関数に渡す
-            val timeData = calculateTime(date)
+
             // ここで外出時間を計算し、分から時間に変換
             val timeData = getTime(date)
             val timeInHours = minToHour(timeData)
