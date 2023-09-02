@@ -36,8 +36,8 @@ class MainActivity : AppCompatActivity() {
     // 現在日時を所得
     val dfDate = SimpleDateFormat("yyyy-M-d")
     val date = dfDate.format(Date())
-    val endDate = "2022-1-1" // 開始日
-    val startDate = date // 終了日
+    val startDate = date // 開始日
+    val endDate = "2022-1-1" // 終了日
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,19 +52,21 @@ class MainActivity : AppCompatActivity() {
         calendarListView.adapter = adapter
 
         cheakButton()
-//        val btGetOut = findViewById<Button>(R.id.btGetOut)
-//        val btGetHome = findViewById<Button>(R.id.btGetHome)
-//
-//        if(homeOrOut() == 0){//　在宅中ならば
-//            // 外出ボタンのみ押せる
-//            btGetOut.isEnabled = true
-//            btGetHome.isEnabled = false
-//        }else{//　外出中ならば
-//            // 帰宅ボタンのみ押せる
-//            btGetOut.isEnabled = false
-//            btGetHome.isEnabled = true
-//        }
 
+
+//        val db = _helper.writableDatabase
+//
+//        Log.i("TAG", "o")
+//        val sqlI = "INSERT INTO GoalTimeLog (num, GoalTimeMin) VALUES (?, ?)"
+//        Log.i("TAG", "on")
+//        val stm = db.compileStatement(sqlI)
+//        //　変数のバインド
+//        Log.i("TAG", "onCreate")
+//        stm.bindString(1, "2")
+//        stm.bindString(2, "333")
+//        Log.i("TAG", "onCreate: ")
+//
+//        stm.executeInsert()
         val btNotification = findViewById<Button>(R.id.btNotification)
         //ボタンクリックのリスナーを設定。
         btNotification.setOnClickListener {
@@ -121,6 +123,39 @@ class MainActivity : AppCompatActivity() {
     }
     fun onGetOutButtonClick(view: View){ // 外出ボタンを押したときの処理
         val db = _helper.writableDatabase
+
+//        Log.i("TAG", "o")
+//        val sql = "INSERT INTO a (b, c) VALUES (null, null)"
+//        Log.i("TAG", "on")
+//        val stm = db.compileStatement(sql)
+//        //　変数のバインド
+//        Log.i("TAG", "onCreate")
+////        stm.bindString(1, "2")
+////        stm.bindString(2, "333")
+//        Log.i("TAG", "onCreate: ")
+
+//        Log.i("TAG", "o")
+//        val sql = "INSERT INTO GoalTimeLog (num, GoalTimeMin) VALUES (null, null)"
+//        Log.i("TAG", "on")
+//        val stm = db.compileStatement(sql)
+//        //　変数のバインド
+//        Log.i("TAG", "onCreate")
+////        stm.bindString(1, "2")
+////        stm.bindString(2, "333")
+//        Log.i("TAG", "onCreate: ")
+////
+//        stm.executeInsert()
+
+//        // TimeSumLogからデータを所得
+//        val sql = "SELECT * FROM GoalTimeLog"
+//        val cursor = db.rawQuery(sql, null)
+//
+//        var timeData = ""
+//        if(cursor.moveToFirst()) {
+//            val timeIdxNote = cursor.getColumnIndex("GoalTimeMin")
+//            timeData = cursor.getString(timeIdxNote)
+//        }
+//        Log.i("TAG", "$timeData")
 
         // DBに日付データが格納されていたら
         if(homeOrOut()==1){
@@ -285,10 +320,25 @@ class MainActivity : AppCompatActivity() {
             timeData = cursor.getString(timeIdxNote)
         }
         db.close()
-        // 外出時間と表示用のステータスを取得してリストに追加
-        val isWeekend = false // ここでは週末の判定を行わないため false としています
-        val dateStatus = DateStatus(date, isWeekend, minToHour(timeData))
-        datesWithStatus.add(dateStatus)
+
+        return timeData
+    }
+
+    // 目標外出時間を所得する
+    fun getGoalTime(): String{
+        val datesWithStatus = mutableListOf<DateStatus>()
+        val db = _helper.writableDatabase
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM GoalTimeLog"
+        val cursor = db.rawQuery(sql,null)
+
+        var timeData = ""
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("GoalTimeMin")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        db.close()
 
         return timeData
     }
@@ -319,36 +369,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // CalendarViewで日にちが選択された時に呼び出されるリスナークラス
-    private inner class DateChangeListener : CalendarView.OnDateChangeListener {
-        override fun onSelectedDayChange(calendarView: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
-
-            // monthは0起算のため+1します。
-            val displayMonth = month + 1
-            // DBの日付検索用文字列を作成
-            var selectedDate = "$displayMonth/$dayOfMonth"
-//            Log.i("TAG", "$selectedDate")
-
-            val db = _helper.writableDatabase
-
-            // TimeSumLogからデータを所得
-            val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
-            val selectionArgs = arrayOf(selectedDate)
-            val cursor = db.rawQuery(sql, selectionArgs)
-
-            while(cursor.moveToNext()) {
-                var timeIdxNote = cursor.getColumnIndex("Date")
-                var timeData = cursor.getString(timeIdxNote)
-//                Log.i("TAG", "$timeData")
-                timeIdxNote = cursor.getColumnIndex("Time")
-                timeData = cursor.getString(timeIdxNote)
-//                Log.i("TAG", "$timeData")
-                Toast.makeText(applicationContext, "${minToHour(timeData)}", Toast.LENGTH_LONG).show()
-            }
-            db.close()
-        }
-    }
-
     private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
         val datesWithStatus = mutableListOf<DateStatus>()
         val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
@@ -363,12 +383,12 @@ class MainActivity : AppCompatActivity() {
 
         while (currentDate >= calendarEnd) {
             val date = dateFormat.format(currentDate.time)
-            val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
-                    (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-            val status = isWeekend
+            val timeInt = getTime(date).toInt()
+            val goalInt = getGoalTime().toInt()
+            val status = timeInt >= goalInt
 
             // ここで外出時間を計算し、分から時間に変換
-            val timeData = calculateTime(date)
+            val timeData = getTime(date)
             val timeInHours = minToHour(timeData)
 
             val dateStatus = DateStatus(date, status, timeInHours)
@@ -379,26 +399,6 @@ class MainActivity : AppCompatActivity() {
 
         return datesWithStatus
     }
-
-    // 日付から外出時間を計算する関数を再実装
-    private fun calculateTime(date: String): String {
-        val db = _helper.writableDatabase
-
-        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
-        val selectionArgs = arrayOf(date)
-        val cursor = db.rawQuery(sql, selectionArgs)
-
-        var timeData = ""
-        while (cursor.moveToNext()) {
-            val timeIdxNote = cursor.getColumnIndex("Time")
-            timeData = cursor.getString(timeIdxNote)
-        }
-        db.close()
-
-        return timeData
-    }
-
-
 }
 
 

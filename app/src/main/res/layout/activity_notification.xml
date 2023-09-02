@@ -11,33 +11,33 @@
         android:id="@+id/numberInput1"
         android:layout_width="129dp"
         android:layout_height="111dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="8dp"
         android:hint="時"
         android:inputType="number"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvNowGoalTime" />
 
     <EditText
         android:id="@+id/numberInput2"
         android:layout_width="152dp"
         android:layout_height="109dp"
-        android:layout_marginStart="192dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:hint="分"
         android:inputType="number"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintStart_toEndOf="@+id/numberInput1"
+        app:layout_constraintTop_toBottomOf="@+id/tvNowGoalTime" />
 
     <Button
         android:id="@+id/completionbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="39dp"
+        android:layout_marginTop="80dp"
         android:onClick="addNumbers"
         android:text="完了"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.452"
+        app:layout_constraintHorizontal_bias="0.829"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/numberInput1" />
 
@@ -50,13 +50,25 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView5"
-        android:layout_width="196dp"
-        android:layout_height="26dp"
-        android:layout_marginStart="91dp"
-        android:layout_marginTop="39dp"
-        android:text="目標時間を設定してください"
-        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/tvGoalTimeSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/tv_goalTimeSetting"
+        android:textSize="34sp"
+        app:layout_constraintStart_toEndOf="@+id/resultText"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvNowGoalTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/tv_nowGoalTime"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvGoalTimeSetting" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

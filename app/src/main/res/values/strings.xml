@@ -15,4 +15,6 @@
     <string name="bt_toLastWeek">先週へ</string>
     <string name="bt_toNextWeek">翌週へ</string>
     <string name="tv_memList">記録リスト</string>
+    <string name="tv_goalTimeSetting">目標外出時間設定</string>
+    <string name="tv_nowGoalTime">現在の目標外出時間：</string>
 </resources>
