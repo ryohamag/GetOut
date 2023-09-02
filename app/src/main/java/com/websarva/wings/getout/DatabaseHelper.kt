@@ -30,15 +30,23 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         db.execSQL(sqlInsertNullRow)
 
 
-//        //　帰宅日時を記録するデータベースを作成
-//        val sbGetHomeLogs = StringBuilder()
-//        sbGetHomeLogs.append("CREATE TABLE GetHomeTimeLogs(")
-//        sbGetHomeLogs.append("getHomeDate TEXT,")
-//        sbGetHomeLogs.append("getHomeHour TEXT,")
-//        sbGetHomeLogs.append("getHomeMin TEXT")
-//        sbGetHomeLogs.append(");")
-//        val sqlGH = sbGetHomeLogs.toString()
-//        db.execSQL(sqlGH)
+        val goalTimeLo = StringBuilder()
+        goalTimeLo.append("CREATE TABLE a(")
+        goalTimeLo.append("b TEXT,")
+        goalTimeLo.append("c TEXT")
+        goalTimeLo.append(");")
+        val sq = goalTimeLo.toString()
+        db.execSQL(sq)
+
+        //　目標外出時間を記録するデータベースを作成
+        val goalTimeLog = StringBuilder()
+        goalTimeLog.append("CREATE TABLE GoalTimeLog(")
+        goalTimeLog.append("GoalTimeMin TEXT")
+        goalTimeLog.append(");")
+        val sql = goalTimeLog.toString()
+        db.execSQL(sql)
+        val sqlInsertNaturalRow = "INSERT INTO GoalTimeLog (GoalTimeMin) VALUES ('480');"
+        db.execSQL(sqlInsertNaturalRow)
 
         // 合計外出時間を記録するデータベースを作成
         val sbTimeSumLog = StringBuilder()
@@ -80,13 +88,6 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
             currentDate = currentDate.plusDays(1)
         }
 
-        //　目標外出時間を記録するデータベースを作成
-        val goalTimeLog = StringBuilder()
-        goalTimeLog.append("CREATE TABLE GoalTimeLog(")
-        goalTimeLog.append("GoalTimeMin TEXT")
-        goalTimeLog.append(");")
-        val sqlgtl = goalTimeLog.toString()
-        db.execSQL(sqlgtl)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
