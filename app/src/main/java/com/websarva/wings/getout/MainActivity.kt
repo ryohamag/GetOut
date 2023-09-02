@@ -22,10 +22,12 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-
-data class DateStatus(val date: String, val status: Boolean, val time: String)
-
-
+data class DateStatus(val date: String, val status: Boolean, val time: String) {
+    val formattedDate: String
+        get() {
+            return date.replaceFirst("^\\d{4}-".toRegex(), "")
+        }
+    }
 class MainActivity : AppCompatActivity() {
 
     //データベースヘルパーオブジェクトを作成
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     // 現在日時を所得
     val dfDate = SimpleDateFormat("yyyy-M-d")
     val date = dfDate.format(Date())
-    val endDate = "2023-01-01" // 開始日
+    val endDate = "2022-1-1" // 開始日
     val startDate = date // 終了日
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -174,6 +176,7 @@ class MainActivity : AppCompatActivity() {
         val date = dfDate.format(Date())
         val hour = dfHour.format(Date())
         val min = dfMin.format(Date())
+
 
         //　現在日時をデータベースに記述
         val sqlInsert = "INSERT INTO GetOutTimeLog (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
@@ -354,7 +357,7 @@ class MainActivity : AppCompatActivity() {
             // monthは0起算のため+1します。
             val displayMonth = month + 1
             // DBの日付検索用文字列を作成
-            var selectedDate = "$year-$displayMonth-$dayOfMonth"
+            var selectedDate = "$displayMonth/$dayOfMonth"
 //            Log.i("TAG", "$selectedDate")
 
             val db = _helper.writableDatabase
@@ -376,6 +379,7 @@ class MainActivity : AppCompatActivity() {
             db.close()
         }
     }
+
     private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
         val datesWithStatus = mutableListOf<DateStatus>()
         val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
@@ -451,10 +455,11 @@ class CalendarAdapter(private val context: Context, private val datesWithStatus:
         val dateTextView = convertView!!.findViewById<TextView>(R.id.dateTextView)
         val dateStatusTextView = convertView.findViewById<TextView>(R.id.dateStatusTextView)
         val timeTextView = convertView.findViewById<TextView>(R.id.timeTextView) // 追加
-
-        dateTextView.text = dateStatus.date
+        dateTextView.text = dateStatus.formattedDate // formattedDateを使用する
         dateStatusTextView.text = if (dateStatus.status) "◯" else "×"
         timeTextView.text = dateStatus.time // 追加
+
+
 
         return convertView
     }

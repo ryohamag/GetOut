@@ -60,8 +60,8 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
 
 
         // 期間の開始と終了日を指定
-        val startDate = "2023-1-1"
-        val endDate = "2023-12-31"
+        val startDate = "2022-1-1"
+        val endDate = "2024-12-31"
 
         // 外出時間サンプルのフォーマットを指定
         val dfTime = DateTimeFormatter.ofPattern("Md")
