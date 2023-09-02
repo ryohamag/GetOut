@@ -22,8 +22,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-data class DateStatus(val date: String, val status: Boolean, val time: String) {
-    val formattedDate: String
+data class DateStatus(val date: String, val status: Boolean, val dayOfWeek: String, val time: String) {    val formattedDate: String
         get() {
             return date.replaceFirst("^\\d{4}-".toRegex(), "")
         }
@@ -256,6 +255,7 @@ class MainActivity : AppCompatActivity() {
         if (startDate == endDate){
             // 今日の日付に外出時間を加算
             addTime(startDate, getTimeDeference(startHour, startMin, endHour, endMin))
+
         }
         else{
             // 日付のフォーマットを指定
@@ -270,28 +270,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     // YYYY-M-d形式の日付から総外出時間を所得する
-    fun getTime(date: String): String{
-        val datesWithStatus = mutableListOf<DateStatus>()
-        val db = _helper.writableDatabase
-
-        // TimeSumLogからデータを所得
-        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
-        val selectionArgs = arrayOf(date)
-        val cursor = db.rawQuery(sql, selectionArgs)
-
-        var timeData = ""
-        while(cursor.moveToNext()) {
-            val timeIdxNote = cursor.getColumnIndex("Time")
-            timeData = cursor.getString(timeIdxNote)
-        }
-        db.close()
-        // 外出時間と表示用のステータスを取得してリストに追加
-        val isWeekend = false // ここでは週末の判定を行わないため false としています
-        val dateStatus = DateStatus(date, isWeekend, minToHour(timeData))
-        datesWithStatus.add(dateStatus)
-
-        return timeData
-    }
 
     // ex)　入力：97　→　出力：1時間37分
     fun minToHour(min: String): String {
@@ -361,17 +339,26 @@ class MainActivity : AppCompatActivity() {
 
         val currentDate = calendarStart.clone() as Calendar
 
-        while (currentDate >= calendarEnd) {
+        while (currentDate.timeInMillis >= calendarEnd.timeInMillis) {
             val date = dateFormat.format(currentDate.time)
+            val dayOfWeek = when (currentDate.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "日"
+                Calendar.MONDAY -> "月"
+                Calendar.TUESDAY -> "火"
+                Calendar.WEDNESDAY -> "水"
+                Calendar.THURSDAY -> "木"
+                Calendar.FRIDAY -> "金"
+                Calendar.SATURDAY -> "土"
+                else -> ""
+            }
             val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
                     (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-            val status = isWeekend
 
-            // ここで外出時間を計算し、分から時間に変換
+            // ここで時間を計算し、minToHour 関数に渡す
             val timeData = calculateTime(date)
             val timeInHours = minToHour(timeData)
 
-            val dateStatus = DateStatus(date, status, timeInHours)
+            val dateStatus = DateStatus(date, isWeekend, dayOfWeek, timeInHours)
             datesWithStatus.add(dateStatus)
 
             currentDate.add(Calendar.DAY_OF_MONTH, -1)
@@ -381,6 +368,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 日付から外出時間を計算する関数を再実装
+// 日付から外出時間を計算する関数を再実装
     private fun calculateTime(date: String): String {
         val db = _helper.writableDatabase
 
@@ -392,6 +380,9 @@ class MainActivity : AppCompatActivity() {
         while (cursor.moveToNext()) {
             val timeIdxNote = cursor.getColumnIndex("Time")
             timeData = cursor.getString(timeIdxNote)
+
+            // デバッグ用ログ出力
+            Log.d("CalculateTime", "Date: $date, TimeData: $timeData")
         }
         db.close()
 
@@ -429,6 +420,10 @@ class CalendarAdapter(private val context: Context, private val datesWithStatus:
         dateTextView.text = dateStatus.formattedDate // formattedDateを使用する
         dateStatusTextView.text = if (dateStatus.status) "◯" else "×"
         timeTextView.text = dateStatus.time // 追加
+        val dateDate = convertView!!.findViewById<TextView>(R.id.dateDate)
+        dateDate.text = dateStatus.dayOfWeek
+
+
 
 
 
