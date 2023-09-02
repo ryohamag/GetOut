@@ -6,11 +6,12 @@
     android:layout_height="wrap_content"
     tools:context=".MainActivity">
 
+
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="129dp"
         android:layout_height="44dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="52dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:textAlignment="center"
@@ -18,19 +19,19 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.571" />
 
     <TextView
         android:id="@+id/timeTextView"
         android:layout_width="150dp"
         android:layout_height="59dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="25dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:textSize="34sp"
         app:layout_constraintEnd_toStartOf="@+id/dateStatusTextView"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/dateTextView"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,12 +40,22 @@
         android:layout_width="62dp"
         android:layout_height="76dp"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
         android:gravity="center"
         android:textSize="48sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/timeTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/dateDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

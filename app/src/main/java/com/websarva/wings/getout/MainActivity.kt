@@ -22,8 +22,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-data class DateStatus(val date: String, val status: Boolean, val time: String) {
-    val formattedDate: String
+data class DateStatus(val date: String, val status: Boolean, val dayOfWeek: String, val time: String) {    val formattedDate: String
         get() {
             return date.replaceFirst("^\\d{4}-".toRegex(), "")
         }
@@ -291,6 +290,7 @@ class MainActivity : AppCompatActivity() {
         if (startDate == endDate){
             // 今日の日付に外出時間を加算
             addTime(startDate, getTimeDeference(startHour, startMin, endHour, endMin))
+
         }
         else{
             // 日付のフォーマットを指定
@@ -369,6 +369,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // CalendarViewで日にちが選択された時に呼び出されるリスナークラス
+    private inner class DateChangeListener : CalendarView.OnDateChangeListener {
+        override fun onSelectedDayChange(calendarView: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
+
+            // monthは0起算のため+1します。
+            val displayMonth = month + 1
+            // DBの日付検索用文字列を作成
+            var selectedDate = "$displayMonth/$dayOfMonth"
+//            Log.i("TAG", "$selectedDate")
+
+            val db = _helper.writableDatabase
+
+            // TimeSumLogからデータを所得
+            val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+            val selectionArgs = arrayOf(selectedDate)
+            val cursor = db.rawQuery(sql, selectionArgs)
+
+            while(cursor.moveToNext()) {
+                var timeIdxNote = cursor.getColumnIndex("Date")
+                var timeData = cursor.getString(timeIdxNote)
+//                Log.i("TAG", "$timeData")
+                timeIdxNote = cursor.getColumnIndex("Time")
+                timeData = cursor.getString(timeIdxNote)
+//                Log.i("TAG", "$timeData")
+                Toast.makeText(applicationContext, "${minToHour(timeData)}", Toast.LENGTH_LONG).show()
+            }
+            db.close()
+        }
+    }
+
     private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
         val datesWithStatus = mutableListOf<DateStatus>()
         val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
@@ -381,17 +411,30 @@ class MainActivity : AppCompatActivity() {
 
         val currentDate = calendarStart.clone() as Calendar
 
-        while (currentDate >= calendarEnd) {
+        while (currentDate.timeInMillis >= calendarEnd.timeInMillis) {
             val date = dateFormat.format(currentDate.time)
+            val dayOfWeek = when (currentDate.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "日"
+                Calendar.MONDAY -> "月"
+                Calendar.TUESDAY -> "火"
+                Calendar.WEDNESDAY -> "水"
+                Calendar.THURSDAY -> "木"
+                Calendar.FRIDAY -> "金"
+                Calendar.SATURDAY -> "土"
+                else -> ""
+            }
+            val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+                    (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
             val timeInt = getTime(date).toInt()
             val goalInt = getGoalTime().toInt()
             val status = timeInt >= goalInt
+
 
             // ここで外出時間を計算し、分から時間に変換
             val timeData = getTime(date)
             val timeInHours = minToHour(timeData)
 
-            val dateStatus = DateStatus(date, status, timeInHours)
+            val dateStatus = DateStatus(date, isWeekend, dayOfWeek, timeInHours)
             datesWithStatus.add(dateStatus)
 
             currentDate.add(Calendar.DAY_OF_MONTH, -1)
@@ -399,6 +442,30 @@ class MainActivity : AppCompatActivity() {
 
         return datesWithStatus
     }
+
+    // 日付から外出時間を計算する関数を再実装
+// 日付から外出時間を計算する関数を再実装
+    private fun calculateTime(date: String): String {
+        val db = _helper.writableDatabase
+
+        val sql = "SELECT * FROM TimeSumLog WHERE Date = ?"
+        val selectionArgs = arrayOf(date)
+        val cursor = db.rawQuery(sql, selectionArgs)
+
+        var timeData = ""
+        while (cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("Time")
+            timeData = cursor.getString(timeIdxNote)
+
+            // デバッグ用ログ出力
+            Log.d("CalculateTime", "Date: $date, TimeData: $timeData")
+        }
+        db.close()
+
+        return timeData
+    }
+
+
 }
 
 
@@ -429,6 +496,10 @@ class CalendarAdapter(private val context: Context, private val datesWithStatus:
         dateTextView.text = dateStatus.formattedDate // formattedDateを使用する
         dateStatusTextView.text = if (dateStatus.status) "◯" else "×"
         timeTextView.text = dateStatus.time // 追加
+        val dateDate = convertView!!.findViewById<TextView>(R.id.dateDate)
+        dateDate.text = dateStatus.dayOfWeek
+
+
 
 
 
