@@ -323,7 +323,12 @@ class MainActivity : AppCompatActivity() {
             timeData = cursor.getString(timeIdxNote)
         }
         db.close()
-        return timeData
+
+        return if (timeData.isEmpty()) {
+            "0"
+        } else {
+            timeData
+        }
     }
 
     // ex)　入力：97　→　出力：1時間37分

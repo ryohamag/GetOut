@@ -24,6 +24,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import com.websarva.wings.getout.MainActivity // MainActivity.ktのパッケージ名を適切に指定
+import java.time.Duration
 
 class ChartWeekActivity : AppCompatActivity() {
     //データベースヘルパーオブジェクトを作成
@@ -33,7 +34,11 @@ class ChartWeekActivity : AppCompatActivity() {
     var referencedDate = Calendar.getInstance()
     val dayOfWeek = referencedDate.get(Calendar.DAY_OF_WEEK)
 
-    val mainActivity = MainActivity()
+    private val dF = SimpleDateFormat("YYYY-M-d", Locale.getDefault())
+    val formattedDate = dF.format(referencedDate.time)
+
+
+//    val mainActivity = MainActivity()
 
 
     var Sun = referencedDate.toInstant()
@@ -44,13 +49,13 @@ class ChartWeekActivity : AppCompatActivity() {
     var Fri = Sun.plusSeconds(86400*5)
     var Sat = Sun.plusSeconds(86400*6)
 
-    var SunData = 105
-    var MonData = 129
-    var TueData = 85
-    var WedData = 104
-    var ThuData = 52
-    var FriData = 84
-    var SatData = 114
+    var SunData = formattedDate
+//    var MonData = formattedDate.plus(Duration.ofDays(1))
+//    var TueData = formattedDate.plus(Duration.ofDays(2))
+//    var WedData = formattedDate.plus(Duration.ofDays(3))
+//    var ThuData = formattedDate.plus(Duration.ofDays(4))
+//    var FriData = formattedDate.plus(Duration.ofDays(5))
+//    var SatData = formattedDate.plus(Duration.ofDays(6))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,12 +73,27 @@ class ChartWeekActivity : AppCompatActivity() {
         var Fri = Sun.plusSeconds(86400*5)
         var Sat = Sun.plusSeconds(86400*6)
 
+
         // X 軸ごとの Y 軸
         val entries: MutableList<String> = mutableListOf()
+        val inputSunDate = SunData
+        val inputSunDateFormat = SimpleDateFormat("yyyy-M-d'T'HH:mm:ss.S'Z'", Locale.getDefault())
+        val SunDate = inputSunDateFormat.parse(inputSunDate)
+        val outputSunDateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+        val formattedSunDate = outputSunDateFormat.format(SunDate)
 
-        val dates = listOf(Sun, Mon, Tue, Wed, Thu, Fri, Sat) // それぞれの日付
+        var SunData = formattedSunDate
+        var MonData = formattedSunDate.plus(Duration.ofDays(1))
+        var TueData = formattedSunDate.plus(Duration.ofDays(2))
+        var WedData = formattedSunDate.plus(Duration.ofDays(3))
+        var ThuData = formattedSunDate.plus(Duration.ofDays(4))
+        var FriData = formattedSunDate.plus(Duration.ofDays(5))
+        var SatData = formattedSunDate.plus(Duration.ofDays(6))
+
+
+        val dates = listOf(SunData, MonData, TueData, WedData, ThuData, FriData, SatData) // それぞれの日付
         for (date in dates) {
-            val time = mainActivity.getTime(date.toString()) // date を文字列に変換して getTime 関数を呼び出す
+            val time = getTime(date.toString()) // date を文字列に変換して getTime 関数を呼び出す
             entries.add(time)
         }
 
@@ -112,7 +132,7 @@ class ChartWeekActivity : AppCompatActivity() {
         // X 軸のフォーマッター
         val xAxisFormatter = object : ValueFormatter() {
             private var simpleDateFormat: SimpleDateFormat =
-                SimpleDateFormat("M/d", Locale.getDefault())
+                SimpleDateFormat("YYYY-M-d", Locale.getDefault())
 
             override fun getFormattedValue(value: Float): String {
                 // value には 0, 1, 2... という index が入ってくるので
@@ -210,30 +230,30 @@ class ChartWeekActivity : AppCompatActivity() {
             when(view.id){
                 R.id.btToLastWeek -> {
                     // 新しいデータを作成
-                    val newEntries: MutableList<Int> = mutableListOf(
-                        activity.SunData,
-                        activity.MonData,
-                        activity.TueData,
-                        activity.WedData,
-                        activity.ThuData,
-                        activity.FriData,
-                        activity.SatData
-                    )
-
-                    val newEntryList = newEntries.mapIndexed { index, entry ->
-                        BarEntry(
-                            index.toFloat(),
-                            entry.toFloat()
-                        )
-                    }
-
-                    // データを更新して再描画
-                    val newBarDataSet = BarDataSet(newEntryList, "barChart")
-                    newBarDataSet.setDrawValues(false)
-                    val newBarData = BarData(mutableListOf<IBarDataSet>(newBarDataSet))
-
-                    // 新しいデータを設定
-                    barChart.data = newBarData
+//                    val newEntries: MutableList<Int> = mutableListOf(
+//                        activity.SunData,
+//                        activity.MonData,
+//                        activity.TueData,
+//                        activity.WedData,
+//                        activity.ThuData,
+//                        activity.FriData,
+//                        activity.SatData
+//                    )
+//
+//                    val newEntryList = newEntries.mapIndexed { index, entry ->
+//                        BarEntry(
+//                            index.toFloat(),
+//                            entry.toFloat()
+//                        )
+//                    }
+//
+//                    // データを更新して再描画
+//                    val newBarDataSet = BarDataSet(newEntryList, "barChart")
+//                    newBarDataSet.setDrawValues(false)
+//                    val newBarData = BarData(mutableListOf<IBarDataSet>(newBarDataSet))
+//
+//                    // 新しいデータを設定
+//                    barChart.data = newBarData
 
                     Log.i("TAG", "${referencedDate.time}")
                     barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getLast7DaysLabels(referencedDate))
@@ -246,31 +266,31 @@ class ChartWeekActivity : AppCompatActivity() {
                     barChart.invalidate()
                 }
                 R.id.btToNextWeek -> {
-                    // 新しいデータを作成
-                    val newEntries: MutableList<Int> = mutableListOf(
-                        activity.SunData,
-                        activity.MonData,
-                        activity.TueData,
-                        activity.WedData,
-                        activity.ThuData,
-                        activity.FriData,
-                        activity.SatData
-                    )
-
-                    val newEntryList = newEntries.mapIndexed { index, entry ->
-                        BarEntry(
-                            index.toFloat(),
-                            entry.toFloat()
-                        )
-                    }
-
-                    // データを更新して再描画
-                    val newBarDataSet = BarDataSet(newEntryList, "barChart")
-                    newBarDataSet.setDrawValues(false)
-                    val newBarData = BarData(mutableListOf<IBarDataSet>(newBarDataSet))
-
-                    // 新しいデータを設定
-                    barChart.data = newBarData
+//                    // 新しいデータを作成
+//                    val newEntries: MutableList<Int> = mutableListOf(
+//                        activity.SunData,
+//                        activity.MonData,
+//                        activity.TueData,
+//                        activity.WedData,
+//                        activity.ThuData,
+//                        activity.FriData,
+//                        activity.SatData
+//                    )
+//
+//                    val newEntryList = newEntries.mapIndexed { index, entry ->
+//                        BarEntry(
+//                            index.toFloat(),
+//                            entry.toFloat()
+//                        )
+//                    }
+//
+//                    // データを更新して再描画
+//                    val newBarDataSet = BarDataSet(newEntryList, "barChart")
+//                    newBarDataSet.setDrawValues(false)
+//                    val newBarData = BarData(mutableListOf<IBarDataSet>(newBarDataSet))
+//
+//                    // 新しいデータを設定
+//                    barChart.data = newBarData
                     barChart.xAxis.valueFormatter = IndexAxisValueFormatter(getNext7DaysLabels(referencedDate))
 
                     // データが変更されたことを通知
