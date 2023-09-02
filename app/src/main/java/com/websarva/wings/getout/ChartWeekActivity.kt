@@ -2,6 +2,7 @@ package com.websarva.wings.getout
 
 import android.annotation.SuppressLint
 import android.app.Notification.CarExtender
+import android.content.ContentValues.TAG
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -25,6 +26,8 @@ import java.util.Date
 import java.util.Locale
 import com.websarva.wings.getout.MainActivity // MainActivity.ktのパッケージ名を適切に指定
 import java.time.Duration
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class ChartWeekActivity : AppCompatActivity() {
     //データベースヘルパーオブジェクトを作成
@@ -49,13 +52,7 @@ class ChartWeekActivity : AppCompatActivity() {
     var Fri = Sun.plusSeconds(86400*5)
     var Sat = Sun.plusSeconds(86400*6)
 
-    var SunData = formattedDate
-//    var MonData = formattedDate.plus(Duration.ofDays(1))
-//    var TueData = formattedDate.plus(Duration.ofDays(2))
-//    var WedData = formattedDate.plus(Duration.ofDays(3))
-//    var ThuData = formattedDate.plus(Duration.ofDays(4))
-//    var FriData = formattedDate.plus(Duration.ofDays(5))
-//    var SatData = formattedDate.plus(Duration.ofDays(6))
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,23 +70,40 @@ class ChartWeekActivity : AppCompatActivity() {
         var Fri = Sun.plusSeconds(86400*5)
         var Sat = Sun.plusSeconds(86400*6)
 
+        val dF = SimpleDateFormat("YYYY-M-d", Locale.getDefault())
+        val formattedSunDate = dF.format(referencedDate.time)
 
         // X 軸ごとの Y 軸
         val entries: MutableList<String> = mutableListOf()
-        val inputSunDate = SunData
-        val inputSunDateFormat = SimpleDateFormat("yyyy-M-d'T'HH:mm:ss.S'Z'", Locale.getDefault())
-        val SunDate = inputSunDateFormat.parse(inputSunDate)
-        val outputSunDateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
-        val formattedSunDate = outputSunDateFormat.format(SunDate)
+//        val inputSunDate = SunData
+//        val inputSunDateFormat = SimpleDateFormat("yyyy-M-d'T'HH:mm:ss.S'Z'", Locale.getDefault())
+//        val SunDate = inputSunDateFormat.parse(inputSunDate)
+//        val outputSunDateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+//        val formattedSunDate = outputSunDateFormat.format(SunDate)
 
-        var SunData = formattedSunDate
-        var MonData = formattedSunDate.plus(Duration.ofDays(1))
-        var TueData = formattedSunDate.plus(Duration.ofDays(2))
-        var WedData = formattedSunDate.plus(Duration.ofDays(3))
-        var ThuData = formattedSunDate.plus(Duration.ofDays(4))
-        var FriData = formattedSunDate.plus(Duration.ofDays(5))
-        var SatData = formattedSunDate.plus(Duration.ofDays(6))
+//        var SunData = formattedSunDate
+//        var MonData = formattedSunDate.plus(Duration.ofDays(1))
+//        var TueData = formattedSunDate.plus(Duration.ofDays(2))
+//        var WedData = formattedSunDate.plus(Duration.ofDays(3))
+//        var ThuData = formattedSunDate.plus(Duration.ofDays(4))
+//        var FriData = formattedSunDate.plus(Duration.ofDays(5))
+//        var SatData = formattedSunDate.plus(Duration.ofDays(6))
+        val formatter = DateTimeFormatter.ofPattern("yyyy-M-d")
 
+        val SunData = LocalDate.parse(formattedSunDate, formatter)
+        var MonData = SunData.plusDays(1)
+        var TueData = SunData.plusDays(2)
+        var WedData = SunData.plusDays(3)
+        var ThuData = SunData.plusDays(4)
+        var FriData = SunData.plusDays(5)
+        var SatData = SunData.plusDays(6)
+        Log.i("Sunday", "$SunData")
+        Log.i("Monday", "$MonData")
+        Log.i("Tuesday", "$TueData")
+        Log.i("Wednesday", "$WedData")
+        Log.i("Thursday", "$ThuData")
+        Log.i("Friday", "$FriData")
+        Log.i("Saturday", "$SatData")
 
         val dates = listOf(SunData, MonData, TueData, WedData, ThuData, FriData, SatData) // それぞれの日付
         for (date in dates) {
@@ -319,7 +333,11 @@ class ChartWeekActivity : AppCompatActivity() {
             timeData = cursor.getString(timeIdxNote)
         }
         db.close()
-        return timeData
+        return if (timeData.isEmpty()) {
+            "100"
+        } else {
+            timeData
+        }
     }
 
 
