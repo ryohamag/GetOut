@@ -33,11 +33,10 @@
         android:id="@+id/completionbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginStart="264dp"
+        android:layout_marginTop="24dp"
         android:onClick="addNumbers"
         android:text="完了"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.829"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/numberInput1" />
 

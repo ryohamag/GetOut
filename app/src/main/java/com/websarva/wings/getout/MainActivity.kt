@@ -14,6 +14,7 @@ import android.widget.CalendarView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -120,53 +121,49 @@ class MainActivity : AppCompatActivity() {
         }
         return returnNum
     }
-    fun onGetOutButtonClick(view: View){ // 外出ボタンを押したときの処理
+    fun onGetOutButtonClick(view: View) {
         val db = _helper.writableDatabase
 
-//        Log.i("TAG", "o")
-//        val sql = "INSERT INTO a (b, c) VALUES (null, null)"
-//        Log.i("TAG", "on")
-//        val stm = db.compileStatement(sql)
-//        //　変数のバインド
-//        Log.i("TAG", "onCreate")
-////        stm.bindString(1, "2")
-////        stm.bindString(2, "333")
-//        Log.i("TAG", "onCreate: ")
-
-//        Log.i("TAG", "o")
-//        val sql = "INSERT INTO GoalTimeLog (num, GoalTimeMin) VALUES (null, null)"
-//        Log.i("TAG", "on")
-//        val stm = db.compileStatement(sql)
-//        //　変数のバインド
-//        Log.i("TAG", "onCreate")
-////        stm.bindString(1, "2")
-////        stm.bindString(2, "333")
-//        Log.i("TAG", "onCreate: ")
-////
-//        stm.executeInsert()
-
-//        // TimeSumLogからデータを所得
-//        val sql = "SELECT * FROM GoalTimeLog"
-//        val cursor = db.rawQuery(sql, null)
-//
-//        var timeData = ""
-//        if(cursor.moveToFirst()) {
-//            val timeIdxNote = cursor.getColumnIndex("GoalTimeMin")
-//            timeData = cursor.getString(timeIdxNote)
-//        }
-//        Log.i("TAG", "$timeData")
-
         // DBに日付データが格納されていたら
-        if(homeOrOut()==1){
+        if (homeOrOut() == 1) {
             // 関数を終了する
             db.close()
             return
         }
+
+        // 確認ダイアログを表示
+        showConfirmationDialog()
+    }
+
+    // 確認ダイアログを表示する関数
+    private fun showConfirmationDialog() {
+        val db = _helper.writableDatabase
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setTitle("外出確認")
+        alertDialogBuilder.setMessage("外出中になりますが、よろしいですか？")
+
+        alertDialogBuilder.setPositiveButton("OK") { _, _ ->
+            // ダイアログのOKボタンがクリックされた場合の処理
+            proceedWithGetOut()
+        }
+
+        alertDialogBuilder.setNegativeButton("キャンセル") { _, _ ->
+            // ダイアログのキャンセルボタンがクリックされた場合の処理
+            // 何もせずにダイアログを閉じる
+            db.close()
+        }
+
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+    }
+
+    // 実際の外出処理を行う関数
+    private fun proceedWithGetOut() {
+        val db = _helper.writableDatabase
         // nullの要素を削除する～♪
         val sqlDelete = "DELETE FROM GetOutTimeLog"
         var stmt = db.compileStatement(sqlDelete)
         stmt.executeUpdateDelete()
-
 
         // 現在日時を所得
         val dfDate = SimpleDateFormat("yyyy-M-d")
@@ -176,11 +173,10 @@ class MainActivity : AppCompatActivity() {
         val hour = dfHour.format(Date())
         val min = dfMin.format(Date())
 
-
-        //　現在日時をデータベースに記述
+        // 現在日時をデータベースに記述
         val sqlInsert = "INSERT INTO GetOutTimeLog (getOutDate, getOutHour, getOutMin) VALUES (?, ?, ?)"
         stmt = db.compileStatement(sqlInsert)
-        //　変数のバインド
+        // 変数のバインド
         stmt.bindString(1, date.toString())
         stmt.bindString(2, hour.toString())
         stmt.bindString(3, min.toString())
@@ -190,16 +186,15 @@ class MainActivity : AppCompatActivity() {
         cheakButton()
     }
     // 帰宅ボタンを押したときの処理
-    fun onGetHomeButtonClick(view:View){
-
+    fun onGetHomeButtonClick(view: View) {
         val db = _helper.writableDatabase
 
         // 外出時刻を所得
         val sql = "SELECT * FROM GetOutTimeLog "
         val cursor = db.rawQuery(sql, null)
 
-        //　GetOutTimeLogは一行しかないからmoveToFirstを使用
-        if(cursor.moveToFirst()) {
+        // GetOutTimeLogは一行しかないからmoveToFirstを使用
+        if (cursor.moveToFirst()) {
             // それぞれの要素を所得
             val dateIdxNote = cursor.getColumnIndex("getOutDate")
             val hourIdxNote = cursor.getColumnIndex("getOutHour")
@@ -210,34 +205,63 @@ class MainActivity : AppCompatActivity() {
 
             // 外出時刻のデータが格納されていなければ（nullか否かで判定します。）
             if (getOutDate == null) {
-//                Log.i("TAG", "nullCheck")
                 // 関数を終了する
                 db.close()
                 return
             }
 
-            // DBに外出時刻データが格納されていれば日付を削除する～♪
-            val sqlDelete = "DELETE FROM GetOutTimeLog"
-            var stmt = db.compileStatement(sqlDelete)
-            stmt.executeUpdateDelete()
-
-            //　nullをデータベースに記述（帰宅したので再び外出できるようにする）
-            val sqlInsert = "INSERT INTO GetOutTimeLog (getOutDate, getOutHour, getOutMin) VALUES (null, null, null)"
-            stmt = db.compileStatement(sqlInsert)
-            stmt.executeInsert()
-
-            // 現在日時を所得
-            val dfDate = SimpleDateFormat("yyyy-M-d")
-            val dfHour = SimpleDateFormat("HH")
-            val dfMin = SimpleDateFormat("mm")
-            val getHomeDate = dfDate.format(Date())
-            val getHomeHour = dfHour.format(Date())
-            val getHomeMin = dfMin.format(Date())
-
-            addDateTime(getOutDate,getOutHour,getOutMin,getHomeDate,getHomeHour,getHomeMin)
-
-            generateDatesInRange(startDate, endDate)
+            // 確認ダイアログを表示
+            showReturnHomeConfirmationDialog(getOutDate, getOutHour, getOutMin)
         }
+    }
+
+    // 帰宅確認ダイアログを表示する関数
+    private fun showReturnHomeConfirmationDialog(getOutDate: String, getOutHour: String, getOutMin: String) {
+        val db = _helper.writableDatabase
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setTitle("帰宅確認")
+        alertDialogBuilder.setMessage("帰宅を完了し、外出データを記録しますか？")
+
+        alertDialogBuilder.setPositiveButton("OK") { _, _ ->
+            // ダイアログのOKボタンがクリックされた場合の処理
+            proceedWithReturnHome(getOutDate, getOutHour, getOutMin)
+        }
+
+        alertDialogBuilder.setNegativeButton("キャンセル") { _, _ ->
+            // ダイアログのキャンセルボタンがクリックされた場合の処理
+            // 何もせずにダイアログを閉じる
+            db.close()
+        }
+
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+    }
+
+    // 実際の帰宅処理を行う関数
+    private fun proceedWithReturnHome(getOutDate: String, getOutHour: String, getOutMin: String) {
+        val db = _helper.writableDatabase
+        // 外出時刻のデータが格納されていれば日付を削除する～♪
+        val sqlDelete = "DELETE FROM GetOutTimeLog"
+        var stmt = db.compileStatement(sqlDelete)
+        stmt.executeUpdateDelete()
+
+        // nullをデータベースに記述（帰宅したので再び外出できるようにする）
+        val sqlInsert = "INSERT INTO GetOutTimeLog (getOutDate, getOutHour, getOutMin) VALUES (null, null, null)"
+        stmt = db.compileStatement(sqlInsert)
+        stmt.executeInsert()
+
+        // 現在日時を所得
+        val dfDate = SimpleDateFormat("yyyy-M-d")
+        val dfHour = SimpleDateFormat("HH")
+        val dfMin = SimpleDateFormat("mm")
+        val getHomeDate = dfDate.format(Date())
+        val getHomeHour = dfHour.format(Date())
+        val getHomeMin = dfMin.format(Date())
+
+        addDateTime(getOutDate, getOutHour, getOutMin, getHomeDate, getHomeHour, getHomeMin)
+
+        generateDatesInRange(startDate, endDate)
+
         db.close()
         cheakButton()
     }
