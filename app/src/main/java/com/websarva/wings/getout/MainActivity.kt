@@ -52,21 +52,11 @@ class MainActivity : AppCompatActivity() {
         calendarListView.adapter = adapter
 
         cheakButton()
+        cheakInformation()
 
+        val tvOutTime = findViewById<TextView>(R.id.tvOutTime)
+        tvOutTime.text = "今日の累計外出時間：${minToHour(getTime(date))}"
 
-//        val db = _helper.writableDatabase
-//
-//        Log.i("TAG", "o")
-//        val sqlI = "INSERT INTO GoalTimeLog (num, GoalTimeMin) VALUES (?, ?)"
-//        Log.i("TAG", "on")
-//        val stm = db.compileStatement(sqlI)
-//        //　変数のバインド
-//        Log.i("TAG", "onCreate")
-//        stm.bindString(1, "2")
-//        stm.bindString(2, "333")
-//        Log.i("TAG", "onCreate: ")
-//
-//        stm.executeInsert()
         val btNotification = findViewById<Button>(R.id.btNotification)
         //ボタンクリックのリスナーを設定。
         btNotification.setOnClickListener {
@@ -184,6 +174,7 @@ class MainActivity : AppCompatActivity() {
         stmt.executeInsert()
         // 押せるボタンの確認
         cheakButton()
+        cheakInformation()
     }
     // 帰宅ボタンを押したときの処理
     fun onGetHomeButtonClick(view: View) {
@@ -264,6 +255,7 @@ class MainActivity : AppCompatActivity() {
 
         db.close()
         cheakButton()
+        cheakInformation()
     }
 
     // 時間データから経過時間を計算する関数、返り値は分
@@ -377,6 +369,34 @@ class MainActivity : AppCompatActivity() {
         return output
     }
 
+    //tvInformationの内容を変更する。
+    fun cheakInformation(){
+        val tvInformation = findViewById<TextView>(R.id.tvInformation)
+
+        if(homeOrOut() == 0){//　在宅中ならば
+            tvInformation.text = "お出かけしませんか？"
+        }else{//　外出中ならば
+            val db = _helper.writableDatabase
+
+            // 外出時刻を所得
+            val sql = "SELECT * FROM GetOutTimeLog "
+            val cursor = db.rawQuery(sql, null)
+
+            // GetOutTimeLogは一行しかないからmoveToFirstを使用
+            if (cursor.moveToFirst()) {
+                // それぞれの要素を所得
+//                val dateIdxNote = cursor.getColumnIndex("getOutDate")
+                val hourIdxNote = cursor.getColumnIndex("getOutHour")
+                val minIdxNote = cursor.getColumnIndex("getOutMin")
+//                val getOutDate = cursor.getString(dateIdxNote)
+                val getOutHour = cursor.getString(hourIdxNote)
+                val getOutMin = cursor.getString(minIdxNote)
+
+                tvInformation.text = "${getOutHour}時${getOutMin}分より外出中"
+            }
+        }
+    }
+
     // 押せるボタンの確認
     fun cheakButton(){
         val btGetOut = findViewById<Button>(R.id.btGetOut)
@@ -387,9 +407,9 @@ class MainActivity : AppCompatActivity() {
             btGetOut.isEnabled = true
             btGetHome.isEnabled = false
         }else{//　外出中ならば
-            // 帰宅ボタンのみ押せる
-            btGetOut.isEnabled = false
-            btGetHome.isEnabled = true
+                // 帰宅ボタンのみ押せる
+                btGetOut.isEnabled = false
+                btGetHome.isEnabled = true
         }
     }
 
@@ -447,8 +467,8 @@ class MainActivity : AppCompatActivity() {
                 Calendar.SATURDAY -> "土"
                 else -> ""
             }
-            val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
-                    (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+//            val isWeekend = (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+//                    (currentDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
             val timeInt = getTime(date).toInt()
             val goalInt = getGoalTime().toInt()
             val status = timeInt >= goalInt
@@ -458,7 +478,7 @@ class MainActivity : AppCompatActivity() {
             val timeData = getTime(date)
             val timeInHours = minToHour(timeData)
 
-            val dateStatus = DateStatus(date, isWeekend, dayOfWeek, timeInHours)
+            val dateStatus = DateStatus(date, status, dayOfWeek, timeInHours)
             datesWithStatus.add(dateStatus)
 
             currentDate.add(Calendar.DAY_OF_MONTH, -1)
@@ -467,8 +487,6 @@ class MainActivity : AppCompatActivity() {
         return datesWithStatus
     }
 
-    // 日付から外出時間を計算する関数を再実装
-// 日付から外出時間を計算する関数を再実装
     private fun calculateTime(date: String): String {
         val db = _helper.writableDatabase
 
