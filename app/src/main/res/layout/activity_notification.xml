@@ -11,12 +11,67 @@
         android:id="@+id/numberInput1"
         android:layout_width="129dp"
         android:layout_height="111dp"
-        android:layout_marginStart="56dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:hint="時"
         android:inputType="number"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvNowGoalTime" />
+
+    <EditText
+        android:id="@+id/editTimeHour"
+        android:layout_width="129dp"
+        android:layout_height="111dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:hint="時"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTimeYear" />
+
+    <EditText
+        android:id="@+id/editTimeMin"
+        android:layout_width="129dp"
+        android:layout_height="111dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="分"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/editTimeHour"
+        app:layout_constraintTop_toBottomOf="@+id/editTimeYear" />
+
+    <EditText
+        android:id="@+id/editTimeYear"
+        android:layout_width="81dp"
+        android:layout_height="79dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:hint="年"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditTime" />
+
+    <EditText
+        android:id="@+id/editTimeDay"
+        android:layout_width="129dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="日"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/editTimeMonth"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditTime" />
+
+    <EditText
+        android:id="@+id/editTimeMonth"
+        android:layout_width="124dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="月"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/editTimeYear"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditTime" />
 
     <EditText
         android:id="@+id/numberInput2"
@@ -33,12 +88,23 @@
         android:id="@+id/completionbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="264dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="68dp"
         android:onClick="addNumbers"
         android:text="完了"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/numberInput1" />
+        app:layout_constraintStart_toEndOf="@+id/numberInput2"
+        app:layout_constraintTop_toBottomOf="@+id/tvNowGoalTime" />
+
+    <Button
+        android:id="@+id/btEditTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="68dp"
+        android:onClick="addNumbers"
+        android:text="完了"
+        app:layout_constraintStart_toEndOf="@+id/editTimeMin"
+        app:layout_constraintTop_toBottomOf="@+id/editTimeDay" />
 
     <TextView
         android:id="@+id/resultText"
@@ -52,18 +118,29 @@
         android:id="@+id/tvGoalTimeSetting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:text="@string/tv_goalTimeSetting"
         android:textSize="34sp"
         app:layout_constraintStart_toEndOf="@+id/resultText"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tvEditTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/tv_editTime"
+        android:textSize="34sp"
+        app:layout_constraintStart_toEndOf="@+id/resultText"
+        app:layout_constraintTop_toBottomOf="@+id/numberInput1" />
+
+    <TextView
         android:id="@+id/tvNowGoalTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="@string/tv_nowGoalTime"
         android:textSize="20sp"
