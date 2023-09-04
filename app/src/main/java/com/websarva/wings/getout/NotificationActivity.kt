@@ -1,5 +1,6 @@
 package com.websarva.wings.getout
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -25,6 +26,7 @@ class NotificationActivity : AppCompatActivity() {
     private lateinit var editTimeHour:EditText
     private lateinit var editTimeMin: EditText
     private lateinit var editButton: Button
+    var settingChangeFlag = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val db = _helper.writableDatabase
@@ -65,8 +67,21 @@ class NotificationActivity : AppCompatActivity() {
                 stmt.bindString(2, date)
                 stmt.execute()
 
+                // NotificationActivity内でIntentから値を取得
+                val intent = intent
+                var settingChangeFlag = intent.getIntExtra("settingChangeFlag", 0)
+
+                settingChangeFlag = 1
+
+                // settingChangeFlagの値をMainActivityに返す
+                val returnIntent = Intent()
+                returnIntent.putExtra("settingChangeFlag", settingChangeFlag)
+                setResult(Activity.RESULT_OK, returnIntent)
+
                 // トーストを表示
                 Toast.makeText(this, "外出時間が更新されました", Toast.LENGTH_SHORT).show()
+
+                finish()
             }
         }
 
