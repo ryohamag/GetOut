@@ -11,7 +11,7 @@
         android:id="@+id/dateTextView"
         android:layout_width="129dp"
         android:layout_height="44dp"
-        android:layout_marginStart="52dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:textAlignment="center"
@@ -24,14 +24,14 @@
 
     <TextView
         android:id="@+id/timeTextView"
-        android:layout_width="150dp"
-        android:layout_height="59dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="176dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="8dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:textSize="34sp"
+        android:textSize="28sp"
         app:layout_constraintEnd_toStartOf="@+id/dateStatusTextView"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/dateTextView"
         app:layout_constraintTop_toTopOf="parent" />
 
