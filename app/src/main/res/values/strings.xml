@@ -20,4 +20,5 @@
     <string name="dialog_msg_getOut">外出しますか？</string>
     <string name="dialog_btn_ok">はい</string>
     <string name="dialog_btn_ng">いいえ</string>
+    <string name="tv_editTime">外出時間編集</string>
 </resources>

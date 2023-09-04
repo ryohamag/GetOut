@@ -19,6 +19,13 @@ class NotificationActivity : AppCompatActivity() {
     private lateinit var numberInput2: EditText
     private lateinit var resultText: TextView
 
+    private lateinit var editTimeYear: EditText
+    private lateinit var editTimeMonth: EditText
+    private lateinit var editTimeDay: EditText
+    private lateinit var editTimeHour:EditText
+    private lateinit var editTimeMin: EditText
+    private lateinit var editButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val db = _helper.writableDatabase
         super.onCreate(savedInstanceState)
@@ -28,36 +35,40 @@ class NotificationActivity : AppCompatActivity() {
         numberInput2 = findViewById(R.id.numberInput2)
         resultText = findViewById(R.id.tvNowGoalTime)
 
+        editTimeYear = findViewById(R.id.editTimeYear)
+        editTimeMonth = findViewById(R.id.editTimeMonth)
+        editTimeDay = findViewById(R.id.editTimeDay)
+        editTimeHour = findViewById(R.id.editTimeHour)
+        editTimeMin = findViewById(R.id.editTimeMin)
+        editButton = findViewById(R.id.btEditTime)
 
         reloadGoalTime()
-//        // GoalTimeLogからデータを所得
-//        val sql = "SELECT * FROM GoalTimeLog"
-//        val cursor = db.rawQuery(sql, null)
-//
-//        var timeData = ""
-//        while(cursor.moveToNext()) {
-//            val timeIdxNote = cursor.getColumnIndex("GoalTimeMin")
-//            timeData = cursor.getString(timeIdxNote)
-//        }
-//        Log.i("TAG", "$timeData")
-//        val rt = resultText.text
-//        var output = "$rt ${minToHour(timeData)}"
-//        resultText.text = output
+
+        editButton.setOnClickListener{
+            if(editTimeYear.text.isNotEmpty() && editTimeMonth.text.isNotEmpty() && editTimeDay.text.isNotEmpty()
+                && editTimeMin.text.isNotEmpty() && editTimeMin.text.isNotEmpty()){
+
+                val hours = editTimeHour.text.toString().toIntOrNull() ?:0
+                val minutes = editTimeMin.text.toString().toIntOrNull() ?:0
+                val time = hours * 60 + minutes
+
+                val year = editTimeYear.text
+                val month = editTimeMonth.text
+                val day = editTimeDay.text
+                val date = "$year-$month-$day"
+
+                //　DBを編集したデータで書き換える
+                val sqlUpdate = "UPDATE TimeSumLog SET Time = ? WHERE Date = ?"
+                var stmt = db.compileStatement(sqlUpdate)
+                //　変数のバインド
+                stmt.bindString(1, time.toString())
+                stmt.bindString(2, date)
+                stmt.execute()
+            }
+        }
 
         val button: Button = findViewById(R.id.completionbutton)
         button.setOnClickListener {
-
-//            db.close()
-//            val sql = "SELECT * FROM GoalTimeLog "
-//            val cursor = db.rawQuery(sql, null)
-//
-//            while(cursor.moveToNext()) {
-//                val dateIdxNote = cursor.getColumnIndex("GoalTimeLog")
-//                val getOutDate = cursor.getString(dateIdxNote)
-//
-//                Log.i("TAG", "$getOutDate")
-//            }
-
 //            // 記入欄がどちらも埋まっていれば
             if (numberInput1.text.isNotEmpty() && numberInput2.text.isNotEmpty()) {
                 // 既存の要素を削除する～♪
