@@ -64,6 +64,9 @@ class NotificationActivity : AppCompatActivity() {
                 stmt.bindString(1, time.toString())
                 stmt.bindString(2, date)
                 stmt.execute()
+
+                // トーストを表示
+                Toast.makeText(this, "外出時間が更新されました", Toast.LENGTH_SHORT).show()
             }
         }
 
