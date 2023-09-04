@@ -178,6 +178,25 @@ class ChartMonthActivity : AppCompatActivity() {
                     toNextYearText.text = "$nextYear 年へ"
                     CurrentYearText.text = "$CurrentYear 年"
                 }
+                R.id.btToNextYear -> {//翌年へボタンが押されたとき
+                    var toLastYearText = findViewById<Button>(R.id.btToLastYear)
+                    var toNextYearText = findViewById<Button>(R.id.btToNextYear)
+                    var CurrentYearText = findViewById<TextView>(R.id.tvCurrentYear)
+
+                    // 一年前の日付を計算
+                    referencedLastYear = referencedLastYear.plusYears(1)
+                    referencedNextYear = referencedNextYear.plusYears(1)
+                    referencedCurrentYear = referencedCurrentYear.plusYears(1)
+
+                    // 年の部分を抽出
+                    val lastYear = referencedLastYear.year
+                    val nextYear = referencedNextYear.year
+                    val CurrentYear = referencedCurrentYear.year
+
+                    toLastYearText.text = "$lastYear 年へ"
+                    toNextYearText.text = "$nextYear 年へ"
+                    CurrentYearText.text = "$CurrentYear 年"
+                }
             }
         }
     }
