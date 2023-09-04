@@ -116,7 +116,7 @@ class ChartWeekActivity : AppCompatActivity() {
         // X 軸のフォーマッター
         val xAxisFormatter = object : ValueFormatter() {
             private var simpleDateFormat: SimpleDateFormat =
-                SimpleDateFormat("M-d", Locale.getDefault())
+                SimpleDateFormat("M/d", Locale.getDefault())
 
             override fun getFormattedValue(value: Float): String {
                 // value には 0, 1, 2... という index が入ってくるので
