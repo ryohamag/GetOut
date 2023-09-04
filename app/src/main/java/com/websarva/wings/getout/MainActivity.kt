@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         val calendarListView = findViewById<ListView>(R.id.calendarListView)
 
 
+
         val dates = generateDatesInRange(startDate, endDate)
         val adapter = CalendarAdapter(this, dates)
 
@@ -57,6 +58,20 @@ class MainActivity : AppCompatActivity() {
         val tvOutTime = findViewById<TextView>(R.id.tvOutTime)
         tvOutTime.text = "今日の累計外出時間：${minToHour(getTime(date))}"
 
+
+//        val db = _helper.writableDatabase
+//
+//        Log.i("TAG", "o")
+//        val sqlI = "INSERT INTO GoalTimeLog (num, GoalTimeMin) VALUES (?, ?)"
+//        Log.i("TAG", "on")
+//        val stm = db.compileStatement(sqlI)
+//        //　変数のバインド
+//        Log.i("TAG", "onCreate")
+//        stm.bindString(1, "2")
+//        stm.bindString(2, "333")
+//        Log.i("TAG", "onCreate: ")
+//
+//        stm.executeInsert()
         val btNotification = findViewById<Button>(R.id.btNotification)
         //ボタンクリックのリスナーを設定。
         btNotification.setOnClickListener {
