@@ -3,6 +3,9 @@ package com.websarva.wings.getout
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
@@ -12,18 +15,40 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import org.w3c.dom.Text
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 class ChartMonthActivity : AppCompatActivity() {
     //データベースヘルパーオブジェクトを作成
     private val _helper = DatabaseHelper(this@ChartMonthActivity)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        val hoge = getTime("2023-3-2")
-        Log.i("TAG", "$hoge")
 
+    // 現在の日付を取得
+    var referencedLastYear = LocalDate.now()
+    var referencedNextYear = LocalDate.now()
+    var referencedCurrentYear = LocalDate.now()
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chart_month)
+
+        var toLastYearText = findViewById<Button>(R.id.btToLastYear)
+        var toNextYearText = findViewById<Button>(R.id.btToNextYear)
+        var CurrentYearText = findViewById<TextView>(R.id.tvCurrentYear)
+
+        // 一年前の日付を計算
+        referencedLastYear = referencedLastYear.minusYears(1)
+        //一年後の日付を計算
+        referencedNextYear = referencedNextYear.plusYears(1)
+
+        // 年の部分を抽出
+        val lastYear = referencedLastYear.year
+        val nextYear = referencedNextYear.year
+        val currentYear = referencedCurrentYear.year
+
+        toLastYearText.text = "$lastYear 年へ"
+        toNextYearText.text = "$nextYear 年へ"
+        CurrentYearText.text = "$currentYear 年"
 
         val barChart: BarChart = findViewById(R.id.barChart)
         // X 軸ごとの Y 軸
@@ -116,6 +141,64 @@ class ChartMonthActivity : AppCompatActivity() {
         // グラフ描画
         barChart.invalidate()
 
+        //リスナクラスのインスタンスを生成。
+        val listener = ToYearListener()
+        //「先週へ」ボタンであるButtonオブジェクトを取得。
+        val btToLastYear = findViewById<Button>(R.id.btToLastYear)
+        //「先週へ」ボタンにリスナを設定。
+        btToLastYear.setOnClickListener(listener)
+
+        val listenerny = ToYearListener()
+        val btToNextWeek = findViewById<Button>(R.id.btToNextYear)
+        btToNextWeek.setOnClickListener(listenerny)
+    }
+
+    //ボタンをクリックしたときのリスナクラス
+    private inner class ToYearListener : View.OnClickListener {
+        @SuppressLint("SetTextI18n")
+        override fun onClick(view: View) {
+            val barChart: BarChart = findViewById(R.id.barChart)
+            when(view.id){
+                R.id.btToLastYear -> {//去年へボタンが押されたとき
+                    var toLastYearText = findViewById<Button>(R.id.btToLastYear)
+                    var toNextYearText = findViewById<Button>(R.id.btToNextYear)
+                    var CurrentYearText = findViewById<TextView>(R.id.tvCurrentYear)
+
+                    // 一年前の日付を計算
+                    referencedLastYear = referencedLastYear.minusYears(1)
+                    referencedNextYear = referencedNextYear.minusYears(1)
+                    referencedCurrentYear = referencedCurrentYear.minusYears(1)
+
+                    // 年の部分を抽出
+                    val lastYear = referencedLastYear.year
+                    val nextYear = referencedNextYear.year
+                    val CurrentYear = referencedCurrentYear.year
+
+                    toLastYearText.text = "$lastYear 年へ"
+                    toNextYearText.text = "$nextYear 年へ"
+                    CurrentYearText.text = "$CurrentYear 年"
+                }
+                R.id.btToNextYear -> {//翌年へボタンが押されたとき
+                    var toLastYearText = findViewById<Button>(R.id.btToLastYear)
+                    var toNextYearText = findViewById<Button>(R.id.btToNextYear)
+                    var CurrentYearText = findViewById<TextView>(R.id.tvCurrentYear)
+
+                    // 一年前の日付を計算
+                    referencedLastYear = referencedLastYear.plusYears(1)
+                    referencedNextYear = referencedNextYear.plusYears(1)
+                    referencedCurrentYear = referencedCurrentYear.plusYears(1)
+
+                    // 年の部分を抽出
+                    val lastYear = referencedLastYear.year
+                    val nextYear = referencedNextYear.year
+                    val CurrentYear = referencedCurrentYear.year
+
+                    toLastYearText.text = "$lastYear 年へ"
+                    toNextYearText.text = "$nextYear 年へ"
+                    CurrentYearText.text = "$CurrentYear 年"
+                }
+            }
+        }
     }
 
     // YYYY-M-d形式の日付から総外出時間を所得する
