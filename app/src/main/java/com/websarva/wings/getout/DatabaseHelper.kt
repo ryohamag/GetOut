@@ -79,7 +79,9 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         while (!currentDate.isAfter(parsedEndDate)) {
             val values = ContentValues()
             values.put("Date", currentDate.format(dfDate))
-            values.put("Time", currentDate.format(dfTime))
+//            values.put("Time", currentDate.format(dfTime))
+            values.put("Time", "1")
+
 
             //　日付と外出時間＝０を挿入
             db.insert("TimeSumLog", null, values)
