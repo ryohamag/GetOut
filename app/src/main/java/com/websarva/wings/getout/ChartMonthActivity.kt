@@ -38,6 +38,8 @@ class ChartMonthActivity : AppCompatActivity() {
         var toNextYearText = findViewById<Button>(R.id.btToNextYear)
         var CurrentYearText = findViewById<TextView>(R.id.tvCurrentYear)
 
+
+
         // 一年前の日付を計算
         referencedLastYear = referencedLastYear.minusYears(1)
         //一年後の日付を計算
@@ -51,6 +53,12 @@ class ChartMonthActivity : AppCompatActivity() {
         toLastYearText.text = "$lastYear 年へ"
         toNextYearText.text = "$nextYear 年へ"
         CurrentYearText.text = "$currentYear 年"
+
+
+
+
+
+
 
         val barChart: BarChart = findViewById(R.id.barChart)
 
@@ -165,8 +173,20 @@ class ChartMonthActivity : AppCompatActivity() {
         btToLastYear.setOnClickListener(listener)
 
         val listenerny = ToYearListener()
-        val btToNextWeek = findViewById<Button>(R.id.btToNextYear)
-        btToNextWeek.setOnClickListener(listenerny)
+        val btToNextYear = findViewById<Button>(R.id.btToNextYear)
+        btToNextYear.setOnClickListener(listenerny)
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     //ボタンをクリックしたときのリスナクラス
@@ -180,6 +200,8 @@ class ChartMonthActivity : AppCompatActivity() {
                     var toNextYearText = findViewById<Button>(R.id.btToNextYear)
                     var CurrentYearText = findViewById<TextView>(R.id.tvCurrentYear)
 
+
+
                     // 一年前の日付を計算
                     referencedLastYear = referencedLastYear.minusYears(1)
                     referencedNextYear = referencedNextYear.minusYears(1)
@@ -192,7 +214,27 @@ class ChartMonthActivity : AppCompatActivity() {
 
                     toLastYearText.text = "$lastYear 年へ"
                     toNextYearText.text = "$nextYear 年へ"
-                    CurrentYearText.text = "$CurrentYear 年"
+                    CurrentYearText.text = "$CurrentYear 年へ"
+
+
+                    if (CurrentYear <= 2020 || CurrentYear >= 2025) {
+                        findViewById<Button>(R.id.btToLastYear).isEnabled = false
+                        findViewById<Button>(R.id.btToNextYear).isEnabled = true
+                    } else {
+                        findViewById<Button>(R.id.btToLastYear).visibility = View.VISIBLE
+                        findViewById<Button>(R.id.btToLastYear).isClickable = true
+                        findViewById<Button>(R.id.btToNextYear).visibility = View.VISIBLE
+                        findViewById<Button>(R.id.btToNextYear).isClickable = true
+                    }
+
+
+
+
+
+
+
+
+
 
                     var JanData = "$CurrentYear-1"
                     var FebData = "$CurrentYear-2"
@@ -302,7 +344,7 @@ class ChartMonthActivity : AppCompatActivity() {
                     var toNextYearText = findViewById<Button>(R.id.btToNextYear)
                     var CurrentYearText = findViewById<TextView>(R.id.tvCurrentYear)
 
-                    // 一年前の日付を計算
+                    // 1年後の日付を計算
                     referencedLastYear = referencedLastYear.plusYears(1)
                     referencedNextYear = referencedNextYear.plusYears(1)
                     referencedCurrentYear = referencedCurrentYear.plusYears(1)
@@ -315,6 +357,20 @@ class ChartMonthActivity : AppCompatActivity() {
                     toLastYearText.text = "$lastYear 年へ"
                     toNextYearText.text = "$nextYear 年へ"
                     CurrentYearText.text = "$CurrentYear 年"
+
+
+
+                    if (CurrentYear <= 2020 || CurrentYear >= 2025) {
+                        findViewById<Button>(R.id.btToLastYear).isEnabled = true
+                        findViewById<Button>(R.id.btToNextYear).isEnabled = false
+                    } else {
+                        findViewById<Button>(R.id.btToLastYear).visibility = View.VISIBLE
+                        findViewById<Button>(R.id.btToLastYear).isClickable = true
+                        findViewById<Button>(R.id.btToNextYear).visibility = View.VISIBLE
+                        findViewById<Button>(R.id.btToNextYear).isClickable = true
+                    }
+
+
 
                     var JanData = "$CurrentYear-1"
                     var FebData = "$CurrentYear-2"
@@ -420,6 +476,8 @@ class ChartMonthActivity : AppCompatActivity() {
                     barChart.invalidate()
                 }
             }
+
+
         }
     }
 
