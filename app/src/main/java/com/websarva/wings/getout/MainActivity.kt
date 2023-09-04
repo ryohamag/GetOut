@@ -45,12 +45,14 @@ class MainActivity : AppCompatActivity() {
         val calendarListView = findViewById<ListView>(R.id.calendarListView)
 
 
+
         val dates = generateDatesInRange(startDate, endDate)
         val adapter = CalendarAdapter(this, dates)
 
         calendarListView.adapter = adapter
 
         cheakButton()
+
 
 
 //        val db = _helper.writableDatabase
