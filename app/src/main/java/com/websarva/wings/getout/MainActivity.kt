@@ -55,8 +55,9 @@ class MainActivity : AppCompatActivity() {
         cheakButton()
         cheakInformation()
 
-        val tvOutTime = findViewById<TextView>(R.id.tvOutTime)
-        tvOutTime.text = "今日の累計外出時間：${minToHour(getTime(date))}"
+//        val tvOutTime = findViewById<TextView>(R.id.tvOutTime)
+//        tvOutTime.text = "今日の累計外出時間：${minToHour(getTime(date))}"
+        reloadOutTime()
 
 
 //        val db = _helper.writableDatabase
@@ -266,11 +267,12 @@ class MainActivity : AppCompatActivity() {
 
         addDateTime(getOutDate, getOutHour, getOutMin, getHomeDate, getHomeHour, getHomeMin)
 
-        generateDatesInRange(startDate, endDate)
+//        generateDatesInRange(startDate, endDate)
 
         db.close()
         cheakButton()
         cheakInformation()
+        reloadOutTime()
     }
 
     // 時間データから経過時間を計算する関数、返り値は分
@@ -384,6 +386,17 @@ class MainActivity : AppCompatActivity() {
         return output
     }
 
+    //tvOutTimeを更新
+    fun reloadOutTime(){
+
+        val dfDate = SimpleDateFormat("yyyy-M-d")
+        val date = dfDate.format(Date())
+
+        val tvOutTime = findViewById<TextView>(R.id.tvOutTime)
+        tvOutTime.text = "今日の累計外出時間：${minToHour(getTime(date))}"
+
+    }
+
     //tvInformationの内容を変更する。
     fun cheakInformation(){
         val tvInformation = findViewById<TextView>(R.id.tvInformation)
@@ -422,9 +435,9 @@ class MainActivity : AppCompatActivity() {
             btGetOut.isEnabled = true
             btGetHome.isEnabled = false
         }else{//　外出中ならば
-                // 帰宅ボタンのみ押せる
-                btGetOut.isEnabled = false
-                btGetHome.isEnabled = true
+            // 帰宅ボタンのみ押せる
+            btGetOut.isEnabled = false
+            btGetHome.isEnabled = true
         }
     }
 
