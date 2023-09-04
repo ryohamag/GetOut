@@ -87,7 +87,6 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
             //　日にちを一日進める
             currentDate = currentDate.plusDays(1)
         }
-
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
