@@ -28,6 +28,8 @@ class ChartMonthActivity : AppCompatActivity() {
     var referencedLastYear = LocalDate.now()
     var referencedNextYear = LocalDate.now()
     var referencedCurrentYear = LocalDate.now()
+
+    val CurrentYear = referencedCurrentYear.year
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chart_month)
@@ -51,20 +53,34 @@ class ChartMonthActivity : AppCompatActivity() {
         CurrentYearText.text = "$currentYear 年"
 
         val barChart: BarChart = findViewById(R.id.barChart)
+
+        var JanData = "$CurrentYear-1"
+        var FebData = "$CurrentYear-2"
+        var MarData = "$CurrentYear-3"
+        var AprData = "$CurrentYear-4"
+        var MayData = "$CurrentYear-5"
+        var JunData = "$CurrentYear-6"
+        var JulData = "$CurrentYear-7"
+        var AugData = "$CurrentYear-8"
+        var SepData = "$CurrentYear-9"
+        var OctData = "$CurrentYear-10"
+        var NovData = "$CurrentYear-11"
+        var DecData = "$CurrentYear-12"
+        Log.i("tag", "$SepData")
         // X 軸ごとの Y 軸
-        val entries: MutableList<Int> = mutableListOf(
-            105,
-            129,
-            85,
-            104,
-            52,
-            84,
-            114,
-            87,
-            99,
-            108,
-            112,
-            129
+        val entries: MutableList<String> = mutableListOf(
+            getMonthTime(JanData),
+            getMonthTime(FebData),
+            getMonthTime(MarData),
+            getMonthTime(AprData),
+            getMonthTime(MayData),
+            getMonthTime(JunData),
+            getMonthTime(JulData),
+            getMonthTime(AugData),
+            getMonthTime(SepData),
+            getMonthTime(OctData),
+            getMonthTime(NovData),
+            getMonthTime(DecData)
         )
 
         // X 軸のタイムスタンプ
@@ -177,6 +193,109 @@ class ChartMonthActivity : AppCompatActivity() {
                     toLastYearText.text = "$lastYear 年へ"
                     toNextYearText.text = "$nextYear 年へ"
                     CurrentYearText.text = "$CurrentYear 年"
+
+                    var JanData = "$CurrentYear-1"
+                    var FebData = "$CurrentYear-2"
+                    var MarData = "$CurrentYear-3"
+                    var AprData = "$CurrentYear-4"
+                    var MayData = "$CurrentYear-5"
+                    var JunData = "$CurrentYear-6"
+                    var JulData = "$CurrentYear-7"
+                    var AugData = "$CurrentYear-8"
+                    var SepData = "$CurrentYear-9"
+                    var OctData = "$CurrentYear-10"
+                    var NovData = "$CurrentYear-11"
+                    var DecData = "$CurrentYear-12"
+                    Log.i("tag", "$SepData")
+                    // X 軸ごとの Y 軸
+                    val entries: MutableList<String> = mutableListOf(
+                        getMonthTime(JanData),
+                        getMonthTime(FebData),
+                        getMonthTime(MarData),
+                        getMonthTime(AprData),
+                        getMonthTime(MayData),
+                        getMonthTime(JunData),
+                        getMonthTime(JulData),
+                        getMonthTime(AugData),
+                        getMonthTime(SepData),
+                        getMonthTime(OctData),
+                        getMonthTime(NovData),
+                        getMonthTime(DecData)
+                    )
+
+                    // X 軸のタイムスタンプ
+                    val entriesTimestampMills: MutableList<String> = mutableListOf(
+                        "Jan.",
+                        "Feb.",
+                        "Mar.",
+                        "Apr.",
+                        "May.",
+                        "Jun.",
+                        "Jul.",
+                        "Aug.",
+                        "Sep.",
+                        "Oct.",
+                        "Nov.",
+                        "Dec."
+                    )
+
+                    // グラフに描画するデータの設定
+                    val entryList = entries.mapIndexed { index, entry ->
+                        BarEntry(
+                            index.toFloat(),    // X 軸 ここに渡すのはあくまで 0, 1, 2... という index
+                            entry.toFloat()     // Y 軸
+                        )
+                    }
+
+                    val barDataSet = BarDataSet(entryList, "barChart")
+                    barDataSet.setDrawValues(false)
+
+                    barChart.data = BarData(mutableListOf<IBarDataSet>(barDataSet))
+                    barChart.setDrawGridBackground(false)
+                    barChart.description.isEnabled = false
+
+                    barChart.legend.apply {
+                        isEnabled = false
+                    }
+
+                    // X 軸のフォーマッター
+                    val xAxisFormatter = object : ValueFormatter() {
+                        override fun getFormattedValue(value: Float): String {
+                            val index = value.toInt()
+                            if (index >= 0 && index < entriesTimestampMills.size) {
+                                return entriesTimestampMills[index]
+                            }
+                            return "" // リストの範囲外の場合は空文字列を返すか、適切なデフォルト値を返すことも考慮できます
+                        }
+                    }
+
+
+                    // X 軸の設定
+                    barChart.xAxis.apply {
+                        position = XAxis.XAxisPosition.BOTTOM
+                        valueFormatter = xAxisFormatter
+                        setDrawGridLines(false)
+
+                        // X 軸のラベル数を月の数に設定
+                        labelCount = entriesTimestampMills.size
+
+                        // ラベルの間隔を調整（1.0fは全ての月を表示するための間隔）
+                        granularity = 1.0f
+                    }
+
+                    // Y 軸（左）の設定
+                    barChart.axisLeft.apply {
+                        setDrawGridLines(true)
+                        axisMinimum = 0f
+                    }
+
+                    // Y 軸（右）の設定
+                    barChart.axisRight.apply {
+                        isEnabled = false
+                    }
+
+                    // グラフ描画
+                    barChart.invalidate()
                 }
                 R.id.btToNextYear -> {//翌年へボタンが押されたとき
                     var toLastYearText = findViewById<Button>(R.id.btToLastYear)
@@ -196,6 +315,109 @@ class ChartMonthActivity : AppCompatActivity() {
                     toLastYearText.text = "$lastYear 年へ"
                     toNextYearText.text = "$nextYear 年へ"
                     CurrentYearText.text = "$CurrentYear 年"
+
+                    var JanData = "$CurrentYear-1"
+                    var FebData = "$CurrentYear-2"
+                    var MarData = "$CurrentYear-3"
+                    var AprData = "$CurrentYear-4"
+                    var MayData = "$CurrentYear-5"
+                    var JunData = "$CurrentYear-6"
+                    var JulData = "$CurrentYear-7"
+                    var AugData = "$CurrentYear-8"
+                    var SepData = "$CurrentYear-9"
+                    var OctData = "$CurrentYear-10"
+                    var NovData = "$CurrentYear-11"
+                    var DecData = "$CurrentYear-12"
+                    Log.i("tag", "$SepData")
+                    // X 軸ごとの Y 軸
+                    val entries: MutableList<String> = mutableListOf(
+                        getMonthTime(JanData),
+                        getMonthTime(FebData),
+                        getMonthTime(MarData),
+                        getMonthTime(AprData),
+                        getMonthTime(MayData),
+                        getMonthTime(JunData),
+                        getMonthTime(JulData),
+                        getMonthTime(AugData),
+                        getMonthTime(SepData),
+                        getMonthTime(OctData),
+                        getMonthTime(NovData),
+                        getMonthTime(DecData)
+                    )
+
+                    // X 軸のタイムスタンプ
+                    val entriesTimestampMills: MutableList<String> = mutableListOf(
+                        "Jan.",
+                        "Feb.",
+                        "Mar.",
+                        "Apr.",
+                        "May.",
+                        "Jun.",
+                        "Jul.",
+                        "Aug.",
+                        "Sep.",
+                        "Oct.",
+                        "Nov.",
+                        "Dec."
+                    )
+
+                    // グラフに描画するデータの設定
+                    val entryList = entries.mapIndexed { index, entry ->
+                        BarEntry(
+                            index.toFloat(),    // X 軸 ここに渡すのはあくまで 0, 1, 2... という index
+                            entry.toFloat()     // Y 軸
+                        )
+                    }
+
+                    val barDataSet = BarDataSet(entryList, "barChart")
+                    barDataSet.setDrawValues(false)
+
+                    barChart.data = BarData(mutableListOf<IBarDataSet>(barDataSet))
+                    barChart.setDrawGridBackground(false)
+                    barChart.description.isEnabled = false
+
+                    barChart.legend.apply {
+                        isEnabled = false
+                    }
+
+                    // X 軸のフォーマッター
+                    val xAxisFormatter = object : ValueFormatter() {
+                        override fun getFormattedValue(value: Float): String {
+                            val index = value.toInt()
+                            if (index >= 0 && index < entriesTimestampMills.size) {
+                                return entriesTimestampMills[index]
+                            }
+                            return "" // リストの範囲外の場合は空文字列を返すか、適切なデフォルト値を返すことも考慮できます
+                        }
+                    }
+
+
+                    // X 軸の設定
+                    barChart.xAxis.apply {
+                        position = XAxis.XAxisPosition.BOTTOM
+                        valueFormatter = xAxisFormatter
+                        setDrawGridLines(false)
+
+                        // X 軸のラベル数を月の数に設定
+                        labelCount = entriesTimestampMills.size
+
+                        // ラベルの間隔を調整（1.0fは全ての月を表示するための間隔）
+                        granularity = 1.0f
+                    }
+
+                    // Y 軸（左）の設定
+                    barChart.axisLeft.apply {
+                        setDrawGridLines(true)
+                        axisMinimum = 0f
+                    }
+
+                    // Y 軸（右）の設定
+                    barChart.axisRight.apply {
+                        isEnabled = false
+                    }
+
+                    // グラフ描画
+                    barChart.invalidate()
                 }
             }
         }
@@ -217,6 +439,35 @@ class ChartMonthActivity : AppCompatActivity() {
         }
         db.close()
         return timeData
+    }
+
+    // YYYY-M形式の日付から月の累計外出時間を所得する
+    fun getMonthTime(date: String): String{
+
+        val startDate = "$date-1"
+        val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+        val calendarStart = Calendar.getInstance()
+        calendarStart.time = dateFormat.parse(startDate)
+
+
+        val calendarEnd = Calendar.getInstance()
+        calendarEnd.time = dateFormat.parse(startDate)
+        // Calendarを次の月の一日に設定
+        calendarEnd.add(Calendar.MONTH, 1)
+        calendarEnd.set(Calendar.DAY_OF_MONTH, 1)
+
+        val currentDate = calendarStart.clone() as Calendar
+        var timeSum = 0
+
+        while (currentDate.timeInMillis < calendarEnd.timeInMillis) {
+            val date = dateFormat.format(currentDate.time)
+            val timeInt = getTime(date).toInt()
+
+            timeSum += timeInt
+
+            currentDate.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        return timeSum.toString()
     }
 }
 
