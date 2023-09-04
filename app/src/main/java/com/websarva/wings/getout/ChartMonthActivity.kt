@@ -214,17 +214,15 @@ class ChartMonthActivity : AppCompatActivity() {
 
                     toLastYearText.text = "$lastYear 年へ"
                     toNextYearText.text = "$nextYear 年へ"
-                    CurrentYearText.text = "$CurrentYear 年へ"
+                    CurrentYearText.text = "$CurrentYear 年"
 
 
                     if (CurrentYear <= 2020 || CurrentYear >= 2025) {
                         findViewById<Button>(R.id.btToLastYear).isEnabled = false
                         findViewById<Button>(R.id.btToNextYear).isEnabled = true
                     } else {
-                        findViewById<Button>(R.id.btToLastYear).visibility = View.VISIBLE
-                        findViewById<Button>(R.id.btToLastYear).isClickable = true
-                        findViewById<Button>(R.id.btToNextYear).visibility = View.VISIBLE
-                        findViewById<Button>(R.id.btToNextYear).isClickable = true
+                        findViewById<Button>(R.id.btToLastYear).isEnabled = true
+                        findViewById<Button>(R.id.btToNextYear).isEnabled = true
                     }
 
 
@@ -364,10 +362,8 @@ class ChartMonthActivity : AppCompatActivity() {
                         findViewById<Button>(R.id.btToLastYear).isEnabled = true
                         findViewById<Button>(R.id.btToNextYear).isEnabled = false
                     } else {
-                        findViewById<Button>(R.id.btToLastYear).visibility = View.VISIBLE
-                        findViewById<Button>(R.id.btToLastYear).isClickable = true
-                        findViewById<Button>(R.id.btToNextYear).visibility = View.VISIBLE
-                        findViewById<Button>(R.id.btToNextYear).isClickable = true
+                        findViewById<Button>(R.id.btToLastYear).isEnabled = true
+                        findViewById<Button>(R.id.btToNextYear).isEnabled = true
                     }
 
 
