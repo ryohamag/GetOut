@@ -362,6 +362,35 @@ class MainActivity : AppCompatActivity() {
         return timeData
     }
 
+    // YYYY-M形式の日付から月の累計外出時間を所得する
+    fun getMonthTime(date: String): String{
+
+        val startDate = "$date-1"
+        val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+        val calendarStart = Calendar.getInstance()
+        calendarStart.time = dateFormat.parse(startDate)
+
+
+        val calendarEnd = Calendar.getInstance()
+        calendarEnd.time = dateFormat.parse(startDate)
+        // Calendarを次の月の一日に設定
+        calendarEnd.add(Calendar.MONTH, 1)
+        calendarEnd.set(Calendar.DAY_OF_MONTH, 1)
+
+        val currentDate = calendarStart.clone() as Calendar
+        var timeSum = 0
+
+        while (currentDate.timeInMillis < calendarEnd.timeInMillis) {
+            val date = dateFormat.format(currentDate.time)
+            val timeInt = getTime(date).toInt()
+
+            timeSum += timeInt
+
+            currentDate.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        return timeSum.toString()
+    }
+
     // 目標外出時間を所得する
     fun getGoalTime(): String{
         val datesWithStatus = mutableListOf<DateStatus>()
