@@ -25,7 +25,7 @@ import java.util.Locale
 
 data class DateStatus(val date: String, val status: Boolean, val dayOfWeek: String, val time: String) {    val formattedDate: String
         get() {
-            return date.replaceFirst("^\\d{4}-".toRegex(), "")
+            return date.replaceFirst("^\\d{0}-".toRegex(), "")
         }
     }
 class MainActivity : AppCompatActivity() {
