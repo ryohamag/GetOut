@@ -102,6 +102,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        reloadOutTime()
+    }
+
     override fun onDestroy() {
         _helper.close()
         super.onDestroy()
