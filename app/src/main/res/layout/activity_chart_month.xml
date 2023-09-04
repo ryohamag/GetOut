@@ -20,4 +20,41 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5" />
 
+    <Button
+        android:id="@+id/btToLastYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/tvCurrentYear"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barChart" />
+
+    <TextView
+        android:id="@+id/tvCurrentYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/btToNextYear"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btToLastYear"
+        app:layout_constraintTop_toBottomOf="@+id/barChart" />
+
+    <Button
+        android:id="@+id/btToNextYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvCurrentYear"
+        app:layout_constraintTop_toBottomOf="@+id/barChart" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
