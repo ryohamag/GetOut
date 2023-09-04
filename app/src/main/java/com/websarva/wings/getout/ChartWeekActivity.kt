@@ -315,9 +315,6 @@ class ChartWeekActivity : AppCompatActivity() {
                     val friFormatted = FriData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
                     val satFormatted = SatData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
 
-                    Log.i("sunday", "$sunFormatted")
-                    Log.i("monday", "$monFormatted")
-
                     val entries: MutableList<String> = mutableListOf()
 
                     val dates = listOf(sunFormatted, monFormatted, tueFormatted, wedFormatted, thuFormatted, friFormatted, satFormatted) // それぞれの日付

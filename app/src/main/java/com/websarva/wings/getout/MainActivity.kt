@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         cheakInformation()
 
 //        val tvOutTime = findViewById<TextView>(R.id.tvOutTime)
-//        tvOutTime.text = "今日の累計外出時間：${minToHour(getTime(date))}"
+//        tvOutTime.text = "今日の外出時間：${minToHour(getTime(date))}"
         reloadOutTime()
 
 
@@ -427,7 +427,7 @@ class MainActivity : AppCompatActivity() {
         val date = dfDate.format(Date())
 
         val tvOutTime = findViewById<TextView>(R.id.tvOutTime)
-        tvOutTime.text = "今日の累計外出時間：${minToHour(getTime(date))}"
+        tvOutTime.text = "今日の外出時間：${minToHour(getTime(date))}"
 
     }
 
