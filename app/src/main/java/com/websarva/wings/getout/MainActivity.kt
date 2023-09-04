@@ -1,6 +1,7 @@
 package com.websarva.wings.getout
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -22,6 +23,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.Random
 
 data class DateStatus(val date: String, val status: Boolean, val dayOfWeek: String, val time: String) {    val formattedDate: String
         get() {
@@ -32,24 +34,26 @@ class MainActivity : AppCompatActivity() {
 
     //データベースヘルパーオブジェクトを作成
     private val _helper = DatabaseHelper(this@MainActivity)
+    // カレンダーリストを作成
+    val datesWithStatus = mutableListOf<DateStatus>()
 
     // 現在日時を所得
     val dfDate = SimpleDateFormat("yyyy-M-d")
     val date = dfDate.format(Date())
     val startDate = date // 開始日
     val endDate = "2022-1-1" // 終了日
+
+    var settingChangeFlag = 0
+
+    lateinit var adapter :CalendarAdapter
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val calendarListView = findViewById<ListView>(R.id.calendarListView)
-
-
-
-        val dates = generateDatesInRange(startDate, endDate)
-        val adapter = CalendarAdapter(this, dates)
-
+        generateDatesInRange(startDate, endDate)
+        adapter = CalendarAdapter(this, datesWithStatus)
         calendarListView.adapter = adapter
 
         cheakButton()
@@ -78,8 +82,9 @@ class MainActivity : AppCompatActivity() {
         btNotification.setOnClickListener {
             //インテントオブジェクトを生成。
             val intent2Notification = Intent(this@MainActivity, NotificationActivity::class.java)
+            intent2Notification.putExtra("settingChangeFlag",settingChangeFlag)
             // 設定画面の起動。
-            startActivity(intent2Notification)
+            startActivityForResult(intent2Notification,1000)
         }
 
 
@@ -105,6 +110,13 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         reloadOutTime()
+        cheakInformation()
+        if (settingChangeFlag == 1){
+            listUpdate()
+            adapter.notifyDataSetChanged() // アダプターに変更を通知
+        }
+//        listUpdate()
+//        adapter.getView()
     }
 
     override fun onDestroy() {
@@ -276,8 +288,11 @@ class MainActivity : AppCompatActivity() {
 
         db.close()
         cheakButton()
-        cheakInformation()
+//        cheakInformation()
+        getHomeMessage()
         reloadOutTime()
+        listUpdate()
+        adapter.notifyDataSetChanged() // アダプターに変更を通知
     }
 
     // 時間データから経過時間を計算する関数、返り値は分
@@ -431,6 +446,28 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // tvInformationの帰宅Ver
+    fun getHomeMessage() {
+        val messages = listOf(
+            "メッセージ1",
+            "メッセージ2",
+            "メッセージ3",
+            // 他にもメッセージを追加できます
+        )
+
+        // ランダムなインデックスを生成
+        val random = Random()
+        val randomIndex = random.nextInt(messages.size)
+
+        // ランダムに選択されたメッセージを取得
+        val randomMessage = messages[randomIndex]
+
+        // AndroidアプリのUIにランダムなメッセージを表示する
+        val tvInformation = findViewById<TextView>(R.id.tvInformation)
+        tvInformation.text = randomMessage
+
+    }
+
     //tvInformationの内容を変更する。
     fun cheakInformation(){
         val tvInformation = findViewById<TextView>(R.id.tvInformation)
@@ -475,6 +512,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1000 && resultCode == Activity.RESULT_OK) {
+            // NotificationActivityからの返り値を受け取る
+            settingChangeFlag = data?.getIntExtra("settingChangeFlag", 0) ?: 0
+
+        }
+    }
+
     // CalendarViewで日にちが選択された時に呼び出されるリスナークラス
     private inner class DateChangeListener : CalendarView.OnDateChangeListener {
         override fun onSelectedDayChange(calendarView: CalendarView, year: Int, month: Int, dayOfMonth: Int) {
@@ -505,8 +552,60 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun generateDatesInRange(startDate: String, endDate: String): List<DateStatus> {
-        val datesWithStatus = mutableListOf<DateStatus>()
+    // カレンダーリストの中身を更新
+    fun listUpdate(){
+        Log.i("list", "$startDate")
+        Log.i("list", "$endDate")
+        val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+
+        val calendarStart = Calendar.getInstance()
+        calendarStart.time = dateFormat.parse(startDate)
+
+        val calendarEnd = Calendar.getInstance()
+        calendarEnd.time = dateFormat.parse(endDate)
+
+        val currentDate = calendarStart.clone() as Calendar
+
+        while (currentDate.timeInMillis >= calendarEnd.timeInMillis) {
+            val date = dateFormat.format(currentDate.time)
+            val dayOfWeek = when (currentDate.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "日"
+                Calendar.MONDAY -> "月"
+                Calendar.TUESDAY -> "火"
+                Calendar.WEDNESDAY -> "水"
+                Calendar.THURSDAY -> "木"
+                Calendar.FRIDAY -> "金"
+                Calendar.SATURDAY -> "土"
+                else -> ""
+            }
+            val timeInt = getTime(date).toInt()
+            val goalInt = getGoalTime().toInt()
+            val status = timeInt >= goalInt
+
+
+            // ここで外出時間を計算し、分から時間に変換
+            val timeData = getTime(date)
+            val timeInHours = minToHour(timeData)
+
+            val dateStatus = DateStatus(date, status, dayOfWeek, timeInHours)
+            // リスト内の要素を日付で検索
+            val index = datesWithStatus.indexOfFirst { it.date == date }
+
+            if (index != -1) {
+                // 日付が見つかった場合、該当する要素を更新
+                datesWithStatus[index] = dateStatus
+//                datesWithStatus[index].timeInHours = newTimeInHours
+                Log.i("dateStatus", "$dateStatus")
+            }
+
+            currentDate.add(Calendar.DAY_OF_MONTH, -1)
+        }
+
+
+    }
+
+    private fun generateDatesInRange(startDate: String, endDate: String) {
+//        val datesWithStatus = mutableListOf<DateStatus>()
         val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
 
         val calendarStart = Calendar.getInstance()
@@ -546,7 +645,7 @@ class MainActivity : AppCompatActivity() {
             currentDate.add(Calendar.DAY_OF_MONTH, -1)
         }
 
-        return datesWithStatus
+//        return datesWithStatus
     }
 
     private fun calculateTime(date: String): String {
@@ -604,11 +703,14 @@ class CalendarAdapter(private val context: Context, private val datesWithStatus:
         dateDate.text = dateStatus.dayOfWeek
 
 
-
-
-
         return convertView
     }
+//    fun setTime(position: Int, newTime: String) {
+//        if (position >= 0 && position < datesWithStatus.size) {
+//            datesWithStatus[position] = datesWithStatus[position].copy(time = newTime)
+//            notifyDataSetChanged() // データセットの変更を通知
+//        }
+//    }
 }
 
 
