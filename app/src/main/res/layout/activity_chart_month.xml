@@ -9,26 +9,29 @@
         android:id="@+id/barChart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="58dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintGuide_percent="0.75" />
 
     <Button
         android:id="@+id/btToLastYear"
         android:layout_width="wrap_content"
-        android:layout_height="79dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="76dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="43dp"
         android:textSize="37sp"
-        app:layout_constraintEnd_toStartOf="@+id/tvCurrentYear"
+        app:layout_constraintEnd_toStartOf="@+id/btToNextYear"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/barChart" />
@@ -38,23 +41,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textSize="40sp"
-        app:layout_constraintEnd_toStartOf="@+id/btToNextYear"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btToLastYear"
-        app:layout_constraintTop_toBottomOf="@+id/barChart" />
+        android:layout_marginBottom="8dp"
+        android:textSize="37sp"
+        app:layout_constraintBottom_toTopOf="@+id/barChart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.175"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/btToNextYear"
         android:layout_width="wrap_content"
-        android:layout_height="78dp"
-        android:layout_marginTop="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="43dp"
         android:layout_marginEnd="8dp"
         android:textSize="37sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvCurrentYear"
+        app:layout_constraintStart_toEndOf="@+id/btToLastYear"
         app:layout_constraintTop_toBottomOf="@+id/barChart" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="4dp"
+        android:text="年グラフ"
+        android:textSize="37sp"
+        app:layout_constraintStart_toEndOf="@+id/tvCurrentYear"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
