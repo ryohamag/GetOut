@@ -11,7 +11,7 @@
         android:id="@+id/numberInput1"
         android:layout_width="129dp"
         android:layout_height="111dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:hint="時"
         android:inputType="number"
@@ -21,7 +21,7 @@
     <EditText
         android:id="@+id/editTimeHour"
         android:layout_width="129dp"
-        android:layout_height="111dp"
+        android:layout_height="79dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:hint="時"
@@ -32,7 +32,7 @@
     <EditText
         android:id="@+id/editTimeMin"
         android:layout_width="129dp"
-        android:layout_height="111dp"
+        android:layout_height="79dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:hint="分"
@@ -42,7 +42,7 @@
 
     <EditText
         android:id="@+id/editTimeYear"
-        android:layout_width="81dp"
+        android:layout_width="110dp"
         android:layout_height="79dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
@@ -64,7 +64,7 @@
 
     <EditText
         android:id="@+id/editTimeMonth"
-        android:layout_width="124dp"
+        android:layout_width="110dp"
         android:layout_height="80dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -75,8 +75,8 @@
 
     <EditText
         android:id="@+id/numberInput2"
-        android:layout_width="152dp"
-        android:layout_height="109dp"
+        android:layout_width="129dp"
+        android:layout_height="111dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:hint="分"
@@ -100,7 +100,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="40dp"
         android:onClick="addNumbers"
         android:text="完了"
         app:layout_constraintStart_toEndOf="@+id/editTimeMin"

@@ -5,8 +5,10 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Random
 import kotlin.math.log
 
@@ -48,7 +50,7 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         goalTimeLog.append(");")
         val sql = goalTimeLog.toString()
         db.execSQL(sql)
-        val sqlInsertNaturalRow = "INSERT INTO GoalTimeLog (GoalTimeMin) VALUES ('480');"
+        val sqlInsertNaturalRow = "INSERT INTO GoalTimeLog (GoalTimeMin) VALUES ('360');"
         db.execSQL(sqlInsertNaturalRow)
 
         // 合計外出時間を記録するデータベースを作成
@@ -65,15 +67,20 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         // 期間の開始と終了日を指定
         val startDate = "2020-1-1"
         val endDate = "2025-12-31"
+        // 現在日時を所得
+        val dfDate = SimpleDateFormat("yyyy-M-d")
+        val date = dfDate.format(Date())
+        Log.i("DB", "$date")
 
-        // 外出時間サンプルのフォーマットを指定
-        val dfTime = DateTimeFormatter.ofPattern("Md")
+//        // 外出時間サンプルのフォーマットを指定
+//        val dfTime = DateTimeFormatter.ofPattern("Md")
 
         // 日付のフォーマットを指定
-        val dfDate = DateTimeFormatter.ofPattern("yyyy-M-d")
+        val df = DateTimeFormatter.ofPattern("yyyy-M-d")
 
-        val parsedStartDate = LocalDate.parse(startDate, dfDate)
-        val parsedEndDate = LocalDate.parse(endDate, dfDate)
+        val today = LocalDate.parse(date, df)
+        val parsedStartDate = LocalDate.parse(startDate, df)
+        val parsedEndDate = LocalDate.parse(endDate, df)
 
         // 参照する日付
         var currentDate = parsedStartDate
@@ -82,7 +89,7 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         // 日付が終了日より前の間
         while (!currentDate.isAfter(parsedEndDate)) {
             val values = ContentValues()
-            values.put("Date", currentDate.format(dfDate))
+            values.put("Date", currentDate.format(df))
 //            values.put("Time", currentDate.format(dfTime))
 //            values.put("Time", "1")
             val minValue = 180
@@ -90,10 +97,13 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
 
             val random = Random()
             val randomValue = random.nextInt(maxValue - minValue + 1) + minValue
-            values.put("Time",randomValue.toString())
-            Log.i("DB", "$randomValue")
-
-
+            if(!currentDate.isAfter(today)) {
+                values.put("Time",randomValue.toString())
+                Log.i("DB", "$randomValue")
+            }
+            else{
+                values.put("Time","0")
+            }
             //　日付と外出時間＝０を挿入
             db.insert("TimeSumLog", null, values)
 
