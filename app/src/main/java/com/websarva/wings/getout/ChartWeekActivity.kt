@@ -159,6 +159,8 @@ class ChartWeekActivity : AppCompatActivity() {
         val limitLine = LimitLine(getGoalTime().toFloat(), "目標時間") // Y軸の位置を100に設定
         limitLine.lineWidth = 2f // 直線の太さを設定
         limitLine.lineColor = Color.RED // 直線の色を設定
+        // "目標時間"の文字サイズを変更
+        limitLine.textSize = 24f
 
         // Y軸（左）に直線を追加
         val leftAxis = barChart.axisLeft
