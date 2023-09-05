@@ -109,6 +109,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val tvGoalTime = findViewById<TextView>(R.id.tvGoalTime)
+        tvGoalTime.text = "目標外出時間：${minToHour(getGoalTime())}"
         reloadOutTime()
         cheakInformation()
         if (settingChangeFlag == 1){
@@ -289,7 +291,7 @@ class MainActivity : AppCompatActivity() {
         db.close()
         cheakButton()
 //        cheakInformation()
-        getHomeMessage()
+        getHomeMessage(getTimeDeference(getOutHour, getOutMin, getHomeHour, getHomeMin))
         reloadOutTime()
         listUpdate()
         adapter.notifyDataSetChanged() // アダプターに変更を通知
@@ -447,11 +449,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     // tvInformationの帰宅Ver
-    fun getHomeMessage() {
+    fun getHomeMessage(time: String) {
         val messages = listOf(
-            "メッセージ1",
-            "メッセージ2",
-            "メッセージ3",
+            "お帰りなさい！おつかれさまです！",
+            "ご飯にする？お風呂にする？\nそれとも、お・で・か・け？",
             // 他にもメッセージを追加できます
         )
 
@@ -465,12 +466,15 @@ class MainActivity : AppCompatActivity() {
         // AndroidアプリのUIにランダムなメッセージを表示する
         val tvInformation = findViewById<TextView>(R.id.tvInformation)
         tvInformation.text = randomMessage
-
+        val tvTimeLog = findViewById<TextView>(R.id.tvTimeLog)
+        tvTimeLog.text = "今回の外出時間：${minToHour(time)}"
     }
 
     //tvInformationの内容を変更する。
     fun cheakInformation(){
         val tvInformation = findViewById<TextView>(R.id.tvInformation)
+        val tvTimeLog = findViewById<TextView>(R.id.tvTimeLog)
+        tvTimeLog.text = ""
 
         if(homeOrOut() == 0){//　在宅中ならば
             tvInformation.text = "お出かけしませんか？"
