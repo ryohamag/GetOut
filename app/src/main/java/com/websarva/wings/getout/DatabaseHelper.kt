@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Random
+import kotlin.math.log
 
 class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,null,DATABASE_VERSION)
 {
@@ -16,6 +18,7 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
     }
 
     override fun onCreate(db: SQLiteDatabase) {
+        Log.i("onCreate", "onCreate: ")
         //　外出日時を記録するデータベースを作成
         val sbGetOutLog = StringBuilder()
         sbGetOutLog.append("CREATE TABLE GetOutTimeLog(")
@@ -75,12 +78,20 @@ class DatabaseHelper(context: Context):SQLiteOpenHelper(context,DATABASE_NAME,nu
         // 参照する日付
         var currentDate = parsedStartDate
 
+        Log.i("DB", "onCreate: ")
         // 日付が終了日より前の間
         while (!currentDate.isAfter(parsedEndDate)) {
             val values = ContentValues()
             values.put("Date", currentDate.format(dfDate))
 //            values.put("Time", currentDate.format(dfTime))
-            values.put("Time", "1")
+//            values.put("Time", "1")
+            val minValue = 180
+            val maxValue = 720
+
+            val random = Random()
+            val randomValue = random.nextInt(maxValue - minValue + 1) + minValue
+            values.put("Time",randomValue.toString())
+            Log.i("DB", "$randomValue")
 
 
             //　日付と外出時間＝０を挿入

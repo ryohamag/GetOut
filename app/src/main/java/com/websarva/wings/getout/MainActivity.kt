@@ -608,6 +608,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+
     private fun generateDatesInRange(startDate: String, endDate: String) {
 //        val datesWithStatus = mutableListOf<DateStatus>()
         val dateFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
