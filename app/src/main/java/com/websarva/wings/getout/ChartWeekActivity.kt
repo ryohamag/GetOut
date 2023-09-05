@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
@@ -44,6 +45,7 @@ class ChartWeekActivity : AppCompatActivity() {
 
         val barChart: BarChart = findViewById(R.id.barChart)
 
+
         referencedDate.add(Calendar.DAY_OF_YEAR, getDayOfWeekAsString(dayOfWeek))
 
         var Sun = referencedDate.toInstant()
@@ -77,6 +79,9 @@ class ChartWeekActivity : AppCompatActivity() {
         val thuFormatted = ThuData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
         val friFormatted = FriData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
         val satFormatted = SatData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
+
+        val tvWeekRange = findViewById<TextView>(R.id.tvWeekRange)
+        tvWeekRange.text = "${SunData.format(DateTimeFormatter.ofPattern("M/d"))}～${SatData.format(DateTimeFormatter.ofPattern("M/d"))}"
 
         val dates = listOf(sunFormatted, monFormatted, tueFormatted, wedFormatted, thuFormatted, friFormatted, satFormatted) // それぞれの日付
         for (date in dates) {
@@ -258,6 +263,11 @@ class ChartWeekActivity : AppCompatActivity() {
                     val friFormatted = FriData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
                     val satFormatted = SatData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
 
+
+                    val tvWeekRange = findViewById<TextView>(R.id.tvWeekRange)
+                    tvWeekRange.text = "${SunData.format(DateTimeFormatter.ofPattern("M/d"))}～${SatData.format(DateTimeFormatter.ofPattern("M/d"))}"
+
+
                     val entries: MutableList<String> = mutableListOf()
 
                     val dates = listOf(sunFormatted, monFormatted, tueFormatted, wedFormatted, thuFormatted, friFormatted, satFormatted) // それぞれの日付
@@ -332,6 +342,11 @@ class ChartWeekActivity : AppCompatActivity() {
                     val thuFormatted = ThuData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
                     val friFormatted = FriData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
                     val satFormatted = SatData.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
+
+
+                    val tvWeekRange = findViewById<TextView>(R.id.tvWeekRange)
+                    tvWeekRange.text = "${SunData.format(DateTimeFormatter.ofPattern("M/d"))}～${SatData.format(DateTimeFormatter.ofPattern("M/d"))}"
+
 
                     val entries: MutableList<String> = mutableListOf()
 
