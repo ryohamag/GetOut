@@ -144,6 +144,8 @@ class ChartMonthActivity : AppCompatActivity() {
             valueFormatter = xAxisFormatter
             setDrawGridLines(false)
 
+            textSize = 12f
+
             // X 軸のラベル数を月の数に設定
             labelCount = entriesTimestampMills.size
 
@@ -155,6 +157,8 @@ class ChartMonthActivity : AppCompatActivity() {
         barChart.axisLeft.apply {
             setDrawGridLines(true)
             axisMinimum = 0f
+
+            textSize = 12f
         }
 
         // Y 軸（右）の設定
