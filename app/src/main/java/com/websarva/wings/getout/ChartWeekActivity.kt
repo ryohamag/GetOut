@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -148,6 +149,17 @@ class ChartWeekActivity : AppCompatActivity() {
         barChart.axisRight.apply {
             isEnabled = false
         }
+
+        // 直線を作成
+        val limitLine = LimitLine(getGoalTime().toFloat(), "目標時間") // Y軸の位置を100に設定
+        limitLine.lineWidth = 2f // 直線の太さを設定
+        limitLine.lineColor = Color.RED // 直線の色を設定
+
+        // Y軸（左）に直線を追加
+        val leftAxis = barChart.axisLeft
+        leftAxis.addLimitLine(limitLine)
+
+
 
         // グラフ描画
         barChart.invalidate()
@@ -387,4 +399,23 @@ class ChartWeekActivity : AppCompatActivity() {
             timeData
         }
     }
+
+    fun getGoalTime(): String{
+        val datesWithStatus = mutableListOf<DateStatus>()
+        val db = _helper.writableDatabase
+
+        // TimeSumLogからデータを所得
+        val sql = "SELECT * FROM GoalTimeLog"
+        val cursor = db.rawQuery(sql,null)
+
+        var timeData = ""
+        while(cursor.moveToNext()) {
+            val timeIdxNote = cursor.getColumnIndex("GoalTimeMin")
+            timeData = cursor.getString(timeIdxNote)
+        }
+        db.close()
+
+        return timeData
+    }
 }
+
