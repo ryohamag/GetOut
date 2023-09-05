@@ -132,12 +132,16 @@ class ChartWeekActivity : AppCompatActivity() {
             position = XAxis.XAxisPosition.BOTTOM
             valueFormatter = xAxisFormatter
             setDrawGridLines(false)
+
+            textSize = 12f
         }
 
         // Y 軸（左）の設定
         barChart.axisLeft.apply {
             setDrawGridLines(true)
             axisMinimum = 0f
+
+            textSize = 12f
         }
 
         // Y 軸（右）の設定
