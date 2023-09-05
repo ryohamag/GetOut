@@ -44,6 +44,21 @@ class NotificationActivity : AppCompatActivity() {
         editTimeMin = findViewById(R.id.editTimeMin)
         editButton = findViewById(R.id.btEditTime)
 
+        // 現在日時を所得
+        val dfYear = SimpleDateFormat("yyyy")
+        val dfMonth = SimpleDateFormat("M")
+        val dfDay = SimpleDateFormat("d")
+
+        val year = dfYear.format(Date())
+        val month = dfMonth.format(Date())
+        val day = dfDay.format(Date())
+
+        Log.i("hhh", "$")
+        editTimeYear.setText(year)
+        editTimeMonth.setText(month)
+        editTimeDay.setText(day)
+
+
         reloadGoalTime()
 
         editButton.setOnClickListener{
@@ -108,6 +123,18 @@ class NotificationActivity : AppCompatActivity() {
                 // トーストを表示
                 Toast.makeText(this, "目標時間が設定されました", Toast.LENGTH_SHORT).show()
                 reloadGoalTime()
+
+                // NotificationActivity内でIntentから値を取得
+                val intent = intent
+                var settingChangeFlag = intent.getIntExtra("settingChangeFlag", 0)
+
+                settingChangeFlag = 1
+
+                // settingChangeFlagの値をMainActivityに返す
+                val returnIntent = Intent()
+                returnIntent.putExtra("settingChangeFlag", settingChangeFlag)
+                setResult(Activity.RESULT_OK, returnIntent)
+                finish()
             }
 
         }
